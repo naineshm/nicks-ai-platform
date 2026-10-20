@@ -1,0 +1,16 @@
+Task Name,Status,Start Date,Due Date,% Complete,Priority,Assignee,Estimated Cost,Actual Cost
+Project Kickoff & Scope Alignment,Completed,2026-08-01,2026-08-05,100,High,Aditi Rao,1500,1450
+User Research & Persona Definition,Completed,2026-08-04,2026-08-14,100,Medium,Marcus Lin,2800,2900
+System Architecture & Data Schema,Completed,2026-08-10,2026-08-20,100,High,Sam Okafor,3500,3400
+Figma UI Component Design System,Completed,2026-08-15,2026-08-28,100,Medium,Marcus Lin,2200,2100
+Core REST API & Microservice Scaffolding,In Progress,2026-08-22,2026-09-08,85,High,Sam Okafor,4200,3800
+Authentication & RBAC Security Layer,Blocked,2026-08-26,2026-09-04,40,High,Sam Okafor,2900,2200
+Frontend Dashboard & Navigation Module,In Progress,2026-08-27,2026-09-10,65,High,Priya Nair,3800,2600
+AI Health Risk Prediction Engine,In Progress,2026-08-29,2026-09-12,50,High,Sam Okafor,3200,1800
+Payment Gateway & Stripe Integration,Not Started,2026-09-05,2026-09-18,0,High,Aditi Rao,4000,0
+Automated E2E Testing Suite,Blocked,2026-08-30,2026-09-06,25,Medium,Wei Zhang,1800,600
+Client Review & Milestone 2 Sign-off,In Progress,2026-08-31,2026-09-07,50,Medium,Aditi Rao,800,400
+Marketing & Landing Page Copywriting,Completed,2026-08-18,2026-08-26,100,Low,Elena Vasquez,900,850
+Production Infrastructure & Kubernetes Setup,Not Started,2026-09-10,2026-09-22,0,High,Wei Zhang,3500,0
+Security Vulnerability & Penetration Audit,Not Started,2026-09-15,2026-09-25,0,High,External Auditor,5000,0
+Beta Launch & Feedback Collection,Not Started,2026-09-20,2026-10-02,0,Medium,Aditi Rao,2500,0

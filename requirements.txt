@@ -1,0 +1,2 @@
+# Python Analytics Microservice Dependencies
+# Standard Library json, sys, random used.

@@ -1,0 +1,16 @@
+{
+  "name": "nicks-ai-enterprise-platform",
+  "version": "2.4.0",
+  "description": "Nick's ai \u2014 Enterprise AI Project Health & Predictive Management Platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "analytics": "python3 analytics/risk_engine.py"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "author": "Enterprise Engineering Team",
+  "license": "ISC"
+}

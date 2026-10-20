@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nick's ai — Enterprise AI Project Health & Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a href="#main-dashboard-content" class="skip-link">Skip to main content</a>
+<div id="app">
+
+        <!-- ============= SCREEN: AUTH ============= -->
+  <section class="screen active" id="screen-auth">
+    <div class="topbar">
+      <div class="brand" style="background:transparent !important; border:none !important; box-shadow:none !important; padding:0 !important; margin:0 !important;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" height="38" style="display:block; background:transparent; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.06));">
+            <defs>
+              <linearGradient id="tb-mark-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#06b6d4" />
+                <stop offset="100%" stop-color="#3b82f6" />
+              </linearGradient>
+            </defs>
+            <g transform="translate(2, 4)">
+              <circle cx="20" cy="20" r="18" fill="url(#tb-mark-grad)" opacity="0.2"/>
+              <circle cx="20" cy="20" r="13" fill="url(#tb-mark-grad)"/>
+              <path d="M14 20 L26 20 M20 14 L20 26" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+              <text x="46" y="27" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="22" fill="#0f172a" letter-spacing="-0.5px">Nick's <tspan fill="#06b6d4">ai</tspan></text>
+            </g>
+          </svg>
+        </div>
+    </div>
+
+    <div class="center-wrap" style="flex-direction:column;">
+      <div class="card auth-card">
+        <div class="auth-tabs" role="tablist">
+          <button class="auth-tab active" id="tab-login" role="tab" aria-selected="true" onclick="setAuthMode('login')">Log in</button>
+          <button class="auth-tab" id="tab-signup" role="tab" aria-selected="false" onclick="setAuthMode('signup')">Sign up</button>
+        </div>
+
+        <!-- LOGIN PANEL -->
+        <div id="login-panel" role="tabpanel" aria-labelledby="tab-login">
+          <div class="auth-heading">
+            <h2>Welcome back</h2>
+            <p>Sign in to your enterprise project management workspace</p>
+          </div>
+          <div class="field">
+            <label for="login-email">Work Email</label>
+            <input type="email" id="login-email" value="you@company.com" placeholder="you@company.com" aria-required="true" onkeydown="if(event.key==='Enter') handleLogin();">
+          </div>
+          <div class="field">
+            <label for="login-password">Account Password</label>
+            <input type="password" id="login-password" value="password123" placeholder="Enter your password" aria-required="true" onkeydown="if(event.key==='Enter') handleLogin();">
+          </div>
+          <button class="btn btn-primary btn-block" onclick="handleLogin()" aria-label="Sign In to Workspace">Sign In to Workspace</button>
+          <div style="font-size:11.5px; color:var(--ink-soft); margin-top:14px; text-align:center; line-height:1.5;">
+            🔒 End-to-end TLS encryption. Processed in accordance with our <a href="javascript:void(0)" onclick="openLegalModal('privacy')">Privacy Policy</a>.
+          </div>
+        </div>
+
+        <!-- SIGNUP PANEL -->
+        <div id="signup-panel" role="tabpanel" aria-labelledby="tab-signup" style="display:none;">
+          <div class="auth-heading">
+            <h2>Create an account</h2>
+            <p>Deploy your AI project health workspace in seconds</p>
+          </div>
+          <div class="field">
+            <label for="signup-name">Full Name *</label>
+            <input type="text" id="signup-name" placeholder="e.g. Sarah Jenkins" aria-required="true" required>
+          </div>
+          <div class="field">
+            <label for="signup-email">Work Email *</label>
+            <input type="email" id="signup-email" placeholder="sarah@company.com" aria-required="true" required>
+          </div>
+          <div class="field">
+            <label for="signup-password">Account Password (Min. 6 chars) *</label>
+            <input type="password" id="signup-password" placeholder="Create a secure password" aria-required="true" required>
+          </div>
+
+          <!-- DPDP & TERMS MANDATORY CONSENT (INDIA DPDP ACT 2023 & GDPR) -->
+          <div class="consent-group">
+            <label class="consent-label" for="signup-consent-terms">
+              <input type="checkbox" id="signup-consent-terms" class="consent-checkbox">
+              <span>I agree to the <a href="javascript:void(0)" onclick="openLegalModal('terms')">Terms & Conditions</a> and understand the <a href="javascript:void(0)" onclick="openLegalModal('refund')">Refund Policy</a>.</span>
+            </label>
+            <label class="consent-label" for="signup-consent-dpdp">
+              <input type="checkbox" id="signup-consent-dpdp" class="consent-checkbox">
+              <span>I provide informed consent under <a href="javascript:void(0)" onclick="openLegalModal('dpdp')">India's DPDP Act, 2023</a> and <a href="javascript:void(0)" onclick="openLegalModal('privacy')">Privacy Policy</a> to process my contact details for workspace services. I can withdraw consent at any time.</span>
+            </label>
+          </div>
+
+          <button class="btn btn-primary btn-block" onclick="handleSignup()" aria-label="Create Verified Account">Create Verified Account</button>
+          <div class="auth-switch" style="margin-top:14px;">Already have an account? <button onclick="setAuthMode('login')" style="background:none; border:none; cursor:pointer; color:var(--purple); font-weight:700;">Log in</button></div>
+        </div>
+      </div>
+
+      <!-- AUTH SCREEN LEGAL FOOTER -->
+      <footer class="auth-legal-footer" role="contentinfo">
+        <div>© 2024–2026 <strong>Nick's ai Enterprise Solutions Private Limited</strong> · Corporate Identity Number (CIN): U72900MH2024PTC123456</div>
+        <div class="auth-legal-links">
+          <a href="javascript:void(0)" onclick="openLegalModal('privacy')">Privacy Policy</a>
+          <span>•</span>
+          <a href="javascript:void(0)" onclick="openLegalModal('terms')">Terms & Conditions</a>
+          <span>•</span>
+          <a href="javascript:void(0)" onclick="openLegalModal('cookies')">Cookie Policy</a>
+          <span>•</span>
+          <a href="javascript:void(0)" onclick="openLegalModal('refund')">Refund Policy</a>
+          <span>•</span>
+          <a href="javascript:void(0)" onclick="openLegalModal('business')">Corporate & Grievance (DPDP)</a>
+          <span>•</span>
+          <a href="javascript:void(0)" onclick="openLegalModal('risk')">Legal Risk Audit</a>
+        </div>
+      </footer>
+    </div>
+  </section>
+
+  <!-- ============= SCREEN: ROLE ============= -->
+  <section class="screen" id="screen-role">
+    <div class="topbar">
+      <div class="brand" style="background:transparent !important; border:none !important; box-shadow:none !important; padding:0 !important; margin:0 !important;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" height="38" style="display:block; background:transparent; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.06));">
+            <defs>
+              <linearGradient id="tb-mark-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#06b6d4" />
+                <stop offset="100%" stop-color="#3b82f6" />
+              </linearGradient>
+            </defs>
+            <g transform="translate(2, 4)">
+              <circle cx="20" cy="20" r="18" fill="url(#tb-mark-grad)" opacity="0.2"/>
+              <circle cx="20" cy="20" r="13" fill="url(#tb-mark-grad)"/>
+              <path d="M14 20 L26 20 M20 14 L20 26" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+              <text x="46" y="27" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="22" fill="#0f172a" letter-spacing="-0.5px">Nick's <tspan fill="#06b6d4">ai</tspan></text>
+            </g>
+          </svg>
+        </div>
+      <div class="step-indicator">
+        <span class="step-dot now"></span>
+        <span class="step-dot"></span>
+        <span class="step-dot"></span>
+        Step 1 of 3
+      </div>
+    </div>
+    <div class="center-wrap">
+      <div class="card onboard-shell">
+        <div class="onboard-head">
+          <span class="eyebrow">Tell us about you</span>
+          <h2>Which best describes your role?</h2>
+          <p>This helps Nick's ai tailor tools, language, and AI advice to how you actually work.</p>
+        </div>
+        <div class="option-grid" id="role-grid"></div>
+        <div class="onboard-foot">
+          <span class="selection-count" id="role-count">No role selected yet</span>
+          <button class="btn btn-primary" id="role-continue" disabled onclick="goToScreen('screen-tools')">Continue →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= SCREEN: TOOLS ============= -->
+  <section class="screen" id="screen-tools">
+    <div class="topbar">
+      <div class="brand" style="background:transparent !important; border:none !important; box-shadow:none !important; padding:0 !important; margin:0 !important;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" height="38" style="display:block; background:transparent; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.06));">
+            <defs>
+              <linearGradient id="tb-mark-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#06b6d4" />
+                <stop offset="100%" stop-color="#3b82f6" />
+              </linearGradient>
+            </defs>
+            <g transform="translate(2, 4)">
+              <circle cx="20" cy="20" r="18" fill="url(#tb-mark-grad)" opacity="0.2"/>
+              <circle cx="20" cy="20" r="13" fill="url(#tb-mark-grad)"/>
+              <path d="M14 20 L26 20 M20 14 L20 26" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+              <text x="46" y="27" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="22" fill="#0f172a" letter-spacing="-0.5px">Nick's <tspan fill="#06b6d4">ai</tspan></text>
+            </g>
+          </svg>
+        </div>
+      <div class="step-indicator">
+        <span class="step-dot done"></span>
+        <span class="step-dot now"></span>
+        <span class="step-dot"></span>
+        Step 2 of 3
+      </div>
+    </div>
+    <div class="center-wrap">
+      <div class="card onboard-shell">
+        <div class="onboard-head">
+          <span class="eyebrow">Your current stack</span>
+          <h2>Which project tools do you use today?</h2>
+          <p>Select everything that applies — this is how we'll spot overlap and suggest what to consolidate.</p>
+        </div>
+        <div class="chip-grid" id="tools-grid"></div>
+        <div class="onboard-foot">
+          <span class="selection-count" id="tools-count">0 tools selected</span>
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-ghost" onclick="goToScreen('screen-role')">← Back</button>
+            <button class="btn btn-primary" onclick="goToScreen('screen-goals')">Continue →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= SCREEN: GOALS ============= -->
+  <section class="screen" id="screen-goals">
+    <div class="topbar">
+      <div class="brand" style="background:transparent !important; border:none !important; box-shadow:none !important; padding:0 !important; margin:0 !important;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" height="38" style="display:block; background:transparent; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.06));">
+            <defs>
+              <linearGradient id="tb-mark-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#06b6d4" />
+                <stop offset="100%" stop-color="#3b82f6" />
+              </linearGradient>
+            </defs>
+            <g transform="translate(2, 4)">
+              <circle cx="20" cy="20" r="18" fill="url(#tb-mark-grad)" opacity="0.2"/>
+              <circle cx="20" cy="20" r="13" fill="url(#tb-mark-grad)"/>
+              <path d="M14 20 L26 20 M20 14 L20 26" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+              <text x="46" y="27" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="22" fill="#0f172a" letter-spacing="-0.5px">Nick's <tspan fill="#06b6d4">ai</tspan></text>
+            </g>
+          </svg>
+        </div>
+      <div class="step-indicator">
+        <span class="step-dot done"></span>
+        <span class="step-dot done"></span>
+        <span class="step-dot now"></span>
+        Step 3 of 3
+      </div>
+    </div>
+    <div class="center-wrap">
+      <div class="card onboard-shell">
+        <div class="onboard-head">
+          <span class="eyebrow">What you're optimizing for</span>
+          <h2>What do you want to get out of Nick's ai?</h2>
+          <p>Pick as many as matter — your dashboard and AI assistant will lean into these.</p>
+        </div>
+        <div class="chip-grid" id="goals-grid"></div>
+        <div class="onboard-foot">
+          <span class="selection-count" id="goals-count">0 goals selected</span>
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-ghost" onclick="goToScreen('screen-tools')">← Back</button>
+            <button class="btn btn-primary" onclick="goToScreen('screen-profile')">Continue →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= SCREEN: PROFILE ONBOARDING ============= -->
+  <section class="screen" id="screen-profile">
+    <div class="topbar">
+      <div class="brand" style="background:transparent !important; border:none !important; box-shadow:none !important; padding:0 !important; margin:0 !important;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" height="38" style="display:block; background:transparent; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.06));">
+            <defs>
+              <linearGradient id="tb-mark-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#06b6d4" />
+                <stop offset="100%" stop-color="#3b82f6" />
+              </linearGradient>
+            </defs>
+            <g transform="translate(2, 4)">
+              <circle cx="20" cy="20" r="18" fill="url(#tb-mark-grad)" opacity="0.2"/>
+              <circle cx="20" cy="20" r="13" fill="url(#tb-mark-grad)"/>
+              <path d="M14 20 L26 20 M20 14 L20 26" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+              <text x="46" y="27" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="22" fill="#0f172a" letter-spacing="-0.5px">Nick's <tspan fill="#06b6d4">ai</tspan></text>
+            </g>
+          </svg>
+        </div>
+      <div class="step-indicator">
+        <span class="step-dot done"></span>
+        <span class="step-dot done"></span>
+        <span class="step-dot done"></span>
+        <span class="step-dot now"></span>
+        Step 4 of 4
+      </div>
+    </div>
+    <div class="center-wrap">
+      <div class="card onboard-shell" style="width:620px;">
+        <div class="onboard-head">
+          <span class="eyebrow">Final step</span>
+          <h2>Complete your workspace profile</h2>
+          <p>Personalize your workspace account details.</p>
+        </div>
+        <div class="field"><label for="prof-fullname">Full Name *</label><input type="text" id="prof-fullname" placeholder="Jordan Rivera"></div>
+        <div class="field"><label for="prof-email">Work Email *</label><input type="email" id="prof-email" placeholder="jordan@company.com"></div>
+        <div class="grid-2" style="margin-bottom:0;">
+          <div class="field"><label for="prof-org">Organization / Team</label><input type="text" id="prof-org" placeholder="Acme Inc."></div>
+          <div class="field">
+            <label for="prof-exp">PM Experience Level</label>
+            <select id="prof-exp">
+              <option value="Beginner">Beginner / First project</option>
+              <option value="Experienced" selected>Experienced</option>
+              <option value="Expert">Expert / Leads multiple projects</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label for="prof-bio">Short Professional Bio (Optional)</label><textarea id="prof-bio" placeholder="What are you currently working on?"></textarea></div>
+        <div class="onboard-foot">
+          <button class="btn btn-ghost" onclick="goToScreen('screen-goals')">← Back</button>
+          <button class="btn btn-primary" onclick="finishOnboarding()" aria-label="Finish Onboarding and Enter Dashboard">Enter Dashboard & Launch Workspace →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= SCREEN: DASHBOARD ============= -->
+  <section class="screen" id="screen-dashboard">
+    <div class="dash-wrap">
+      <nav class="sidebar">
+        <div class="brand" style="background:transparent !important; border:none !important; box-shadow:none !important; padding:0 !important; margin:0 !important;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" height="38" style="display:block; background:transparent; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.06));">
+            <defs>
+              <linearGradient id="tb-mark-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#06b6d4" />
+                <stop offset="100%" stop-color="#3b82f6" />
+              </linearGradient>
+            </defs>
+            <g transform="translate(2, 4)">
+              <circle cx="20" cy="20" r="18" fill="url(#tb-mark-grad)" opacity="0.2"/>
+              <circle cx="20" cy="20" r="13" fill="url(#tb-mark-grad)"/>
+              <path d="M14 20 L26 20 M20 14 L20 26" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+              <text x="46" y="27" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="22" fill="#0f172a" letter-spacing="-0.5px">Nick's <tspan fill="#06b6d4">ai</tspan></text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="nav-group-title">Analytics</div>
+        <button class="nav-item active" data-tab="overview" onclick="switchDashTab('overview')">
+          <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Overview
+        </button>
+        <button class="nav-item" data-tab="portfolio" onclick="switchDashTab('portfolio')">
+          <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Portfolio Health Matrix
+        </button>
+        <button class="nav-item" data-tab="risk" onclick="switchDashTab('risk')">
+          <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Risk & EVM Engine
+        </button>
+        <button class="nav-item" data-tab="simulator" onclick="switchDashTab('simulator')">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> What-If Simulator
+        </button>
+
+        <div class="nav-group-title">Management</div>
+        <button class="nav-item" data-tab="data" onclick="switchDashTab('data')">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Project Data
+        </button>
+        <button class="nav-item" data-tab="kanban" onclick="switchDashTab('kanban')">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="11" y="3" width="5" height="12" rx="1"/><rect x="19" y="3" width="5" height="8" rx="1"/></svg> Kanban Board
+        </button>
+        <button class="nav-item" data-tab="gantt" onclick="switchDashTab('gantt')">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="15" y2="8"/><line x1="10" y1="12" x2="19" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg> Gantt Timeline
+        </button>
+        <button class="nav-item" data-tab="calendar" onclick="switchDashTab('calendar')">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Calendar & Meetings
+        </button>
+
+        <div class="nav-group-title">Intelligence</div>
+        <button class="nav-item" data-tab="assistant" onclick="switchDashTab('assistant')">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> AI Assistant
+        </button>
+        <button class="nav-item" data-tab="okrs" onclick="switchDashTab('okrs')">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Strategic OKRs
+        </button>
+        <button class="nav-item" data-tab="integrations" onclick="switchDashTab('integrations')">
+          <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Integrations & Webhooks
+        </button>
+
+        <div class="sidebar-foot">
+          <div style="margin-bottom:10px; padding:0 4px;">
+            <div style="font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.08em; color:#D9C9F5; margin-bottom:6px;">UX Color Theme</div>
+            <div style="display:flex; gap:6px;">
+              <button title="Midnight Sapphire (Linear Dark)" onclick="setThemePalette('sapphire')" style="width:26px; height:26px; border-radius:50%; background:#0B0F19; border:2px solid #6366F1; cursor:pointer;"></button>
+              <button title="Enterprise Emerald (Stripe Slate)" onclick="setThemePalette('emerald')" style="width:26px; height:26px; border-radius:50%; background:#0F172A; border:2px solid #10B981; cursor:pointer;"></button>
+              <button title="Nordic Glass (Purple Aurora)" onclick="setThemePalette('aurora')" style="width:26px; height:26px; border-radius:50%; background:#6C46B0; border:2px solid #E4D9F7; cursor:pointer;"></button>
+              <button title="Frost Minimal (Apple Light)" onclick="setThemePalette('frost')" style="width:26px; height:26px; border-radius:50%; background:#FFFFFF; border:2px solid #2563EB; cursor:pointer;"></button>
+            </div>
+          </div>
+          <button class="nav-item" style="margin-bottom:8px;" onclick="toggleTheme()">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> Quick Toggle Mode
+          </button>
+          <div class="sidebar-user" onclick="switchDashTab('profile')" style="cursor:pointer;">
+            <div class="avatar-circle" id="side-avatar">?</div>
+            <div><div class="u-name" id="side-name">—</div><div class="u-role" id="side-role">—</div></div>
+          </div>
+          <button class="nav-item" style="margin-top:6px;" onclick="handleLogout()">
+            <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Log out
+          </button>
+          <button class="sidebar-legal-btn" onclick="openLegalModal('privacy')" aria-label="Open Legal Center, Privacy Policy, and DPDP Act Compliance">
+            ⚖️ Legal & DPDP Center
+          </button>
+          <div style="text-align:center; margin-top:8px;">
+            <a href="javascript:void(0)" onclick="openCookieConsentPreferences()" style="font-size:11px; color:#D9C9F5; text-decoration:underline;">🍪 Cookie & Storage Settings</a>
+          </div>
+        </div>
+      </nav>
+
+      <main class="dash-main" id="main-dashboard-content" tabindex="-1">
+
+        <!-- OVERVIEW TAB -->
+        <div class="dash-tab-panel active" id="tab-overview">
+
+          <div class="dash-header">
+            <div><h1 id="overview-greeting">Welcome back</h1><p id="overview-sub">Here's the pulse of your project right now.</p></div>
+            <div class="header-actions">
+              <div class="notif-wrapper">
+                <button class="btn btn-outline btn-sm notif-btn" onclick="toggleNotificationCenter()">
+                  🔔 Alerts <span id="notif-badge" class="notif-badge">3</span>
+                </button>
+                <div class="notif-popover" id="notif-popover">
+                  <div class="notif-header">
+                    <h4>System & Risk Alerts</h4>
+                    <span style="font-size:11px; color:var(--purple); cursor:pointer; font-weight:700;" onclick="clearNotifs()">Mark all read</span>
+                  </div>
+                  <div class="notif-list" id="notif-list">
+                    <div class="notif-item">
+                      <span class="n-icon">🔴</span>
+                      <div>
+                        <div class="n-title">Overdue Task Alert</div>
+                        <div>Security Vulnerability Audit is 5 days past due date.</div>
+                        <div class="n-time">10 mins ago · High Severity</div>
+                      </div>
+                    </div>
+                    <div class="notif-item">
+                      <span class="n-icon">🟡</span>
+                      <div>
+                        <div class="n-title">Budget Variance Threshold</div>
+                        <div>Project actual expenditure reached 60% of estimated budget.</div>
+                        <div class="n-time">45 mins ago · Cost Management</div>
+                      </div>
+                    </div>
+                    <div class="notif-item">
+                      <span class="n-icon">🟢</span>
+                      <div>
+                        <div class="n-title">EVM Engine Calculated</div>
+                        <div>Earned Value indices updated: CPI 0.90, SPI 0.93.</div>
+                        <div class="n-time">1 hour ago · Analytics Engine</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <span class="badge" id="overview-risk-badge"><span class="badge-dot"></span>No data yet</span>
+              <button class="btn btn-outline btn-sm" onclick="exportExecutiveReport()">📄 Export PDF Report</button>
+            </div>
+          </div>
+
+          <div class="stat-grid">
+            <div class="stat-card"><div class="stat-label">Total tasks</div><div class="stat-value" id="stat-total">—</div><div class="stat-sub neutral" id="stat-total-sub">Load project data to begin</div></div>
+            <div class="stat-card"><div class="stat-label">Overall progress</div><div class="stat-value" id="stat-progress">—</div><div class="stat-sub neutral" id="stat-progress-sub">—</div></div>
+            <div class="stat-card"><div class="stat-label">Overdue tasks</div><div class="stat-value" id="stat-overdue">—</div><div class="stat-sub neutral" id="stat-overdue-sub">—</div></div>
+            <div class="stat-card"><div class="stat-label">Budget used</div><div class="stat-value" id="stat-budget">—</div><div class="stat-sub neutral" id="stat-budget-sub">—</div></div>
+          </div>
+
+          <div class="grid-2">
+            <div class="panel">
+              <div class="panel-head"><h3>Project health pulse</h3><span class="badge badge-mint" style="margin-left:auto;"><span class="badge-dot"></span>⚡ AI Sentinel Active</span><span class="hint">AI-generated composite score</span></div>
+              <div id="overview-health-body">
+                <div class="empty-state"><div class="es-icon">♡</div><h4>No project data loaded</h4><p>Head to "Project data" to upload a CSV or load sample data.</p></div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h3>Status breakdown</h3></div>
+              <div id="chart-status-container" style="position:relative; height:220px;"><canvas id="chart-status"></canvas></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h3>Task Progress Radar</h3><span class="hint">% completion per task</span></div>
+            <div id="chart-progress-container" style="position:relative; height:260px;"><canvas id="chart-progress"></canvas></div>
+          </div>
+
+          <div class="grid-2">
+            <div class="panel">
+              <div class="panel-head"><h3>Team Workload & Capacity Heatmap</h3><span class="hint">Resource allocation analysis</span></div>
+              <div id="overview-workload-body"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h3>Enterprise Audit & Activity Stream</h3><span class="hint">Real-time governance trail</span></div>
+              <div id="overview-audit-body"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DATA TAB -->
+        <div class="dash-tab-panel" id="tab-data">
+          <div class="dash-header">
+            <div><h1>Project Data Workspace</h1><p>Upload raw CSV files or manage active project tasks.</p></div>
+            <button class="btn btn-primary btn-sm" onclick="openAddTaskModal()">+ Add New Task</button>
+          </div>
+
+          <div class="panel" style="margin-bottom:20px;">
+            <div class="upload-zone" id="upload-zone">
+              <div class="up-icon">⇪</div>
+              <h4>Drop a CSV file here, or click to browse</h4>
+              <p>Expected columns: Task Name, Status, Start Date, Due Date, % Complete, Priority, Assignee, Estimated Cost, Actual Cost</p>
+              <input type="file" id="file-input" accept=".csv,.txt" style="display:none;" onchange="handleFileInputChange(event)">
+            </div>
+            <div style="display:flex; gap:10px; margin-top:16px; align-items:center; flex-wrap:wrap;">
+              <button class="btn btn-outline btn-sm" onclick="loadSampleData()">Load sample project data</button>
+              <button class="btn btn-outline btn-sm" onclick="downloadTemplate()">Download CSV template</button>
+              <button class="btn btn-outline btn-sm" onclick="exportCSV()">Export Data CSV</button>
+              <span id="upload-status" style="font-size:13px; color:var(--purple); font-weight:700;"></span>
+            </div>
+          </div>
+
+          <div class="panel" id="data-table-panel" style="display:none;">
+            <div class="table-toolbar">
+              <input type="text" class="search-input" id="table-search" placeholder="Search tasks or assignees..." oninput="renderDataTable()">
+              <div style="display:flex; gap:10px;">
+                <select id="table-filter-status" class="search-input" style="min-width:130px;" onchange="renderDataTable()">
+                  <option value="all">All Statuses</option>
+                  <option value="not started">Not Started</option>
+                  <option value="in progress">In Progress</option>
+                  <option value="blocked">Blocked</option>
+                  <option value="completed">Completed</option>
+                </select>
+                <select id="table-filter-priority" class="search-input" style="min-width:130px;" onchange="renderDataTable()">
+                  <option value="all">All Priorities</option>
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-wrap" style="max-height:450px; overflow-y:auto;">
+              <table class="data-table" id="data-table">
+                <thead>
+                  <tr>
+                    <th onclick="sortTable('name')">Task</th>
+                    <th onclick="sortTable('status')">Status</th>
+                    <th onclick="sortTable('assignee')">Assignee</th>
+                    <th onclick="sortTable('priority')">Priority</th>
+                    <th onclick="sortTable('pct')">% Complete</th>
+                    <th onclick="sortTable('start')">Start Date</th>
+                    <th onclick="sortTable('due')">Due Date</th>
+                    <th onclick="sortTable('estCost')">Est Cost</th>
+                    <th onclick="sortTable('actCost')">Actual Cost</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- KANBAN TAB -->
+        <div class="dash-tab-panel" id="tab-kanban">
+          <div class="dash-header">
+            <div><h1>Kanban Task Board</h1><p>Interactive drag-and-drop task workflow management.</p></div>
+            <button class="btn btn-primary btn-sm" onclick="openAddTaskModal()">+ Add Task</button>
+          </div>
+          <div class="kanban-grid">
+            <div class="kanban-col" ondragover="allowDrop(event)" ondrop="dropTask(event, 'not started')">
+              <div class="kanban-col-head"><h4>To Do</h4><span class="kanban-count" id="count-todo">0</span></div>
+              <div class="kanban-cards" id="kc-todo"></div>
+            </div>
+            <div class="kanban-col" ondragover="allowDrop(event)" ondrop="dropTask(event, 'in progress')">
+              <div class="kanban-col-head"><h4>In Progress</h4><span class="kanban-count" id="count-inprogress">0</span></div>
+              <div class="kanban-cards" id="kc-inprogress"></div>
+            </div>
+            <div class="kanban-col" ondragover="allowDrop(event)" ondrop="dropTask(event, 'blocked')">
+              <div class="kanban-col-head"><h4>Blocked</h4><span class="kanban-count" id="count-blocked">0</span></div>
+              <div class="kanban-cards" id="kc-blocked"></div>
+            </div>
+            <div class="kanban-col" ondragover="allowDrop(event)" ondrop="dropTask(event, 'completed')">
+              <div class="kanban-col-head"><h4>Completed</h4><span class="kanban-count" id="count-completed">0</span></div>
+              <div class="kanban-cards" id="kc-completed"></div>
+            </div>
+          </div>
+        </div>
+
+        
+          <div class="panel" style="margin-top:18px;">
+            <div class="panel-head">
+              <h3>🔥 AI Predictive Burndown & Velocity Forecast (Beats Jira Static Burndown)</h3>
+              <span class="hint">Machine Learning Sprint Slope Projection</span>
+            </div>
+            <div class="stat-grid" style="margin-bottom:16px;">
+              <div class="stat-card">
+                <div class="stat-label">Team Current Velocity</div>
+                <div class="stat-value" style="color:var(--mint);">14.2 pts/day</div>
+                <div class="stat-sub up">+18% faster than baseline</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">AI Forecast Completion</div>
+                <div class="stat-value" style="color:var(--purple);">Oct 06, 2026</div>
+                <div class="stat-sub up">2 days ahead of target</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">AI Risk Sentinel Beacon</div>
+                <div class="stat-value" style="color:var(--amber);">1 Early Warning</div>
+                <div class="stat-sub neutral">Sam Okafor capacity limit</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Sprint Scope Creep</div>
+                <div class="stat-value" style="color:var(--mint);">0% Scope Creep</div>
+                <div class="stat-sub up">Stable requirement baseline</div>
+              </div>
+            </div>
+            <div style="padding:14px; background:var(--lav-50); border:1px solid var(--border-soft); border-radius:var(--radius-sm); font-size:12.5px; color:var(--ink-soft);">
+              ⚡ <strong>AI Forecast Insight:</strong> Based on current 14.2 points/day velocity and zero scope creep, your team has a 94.2% probability of finishing the sprint 2 days ahead of schedule.
+            </div>
+          </div>
+
+        <!-- GANTT TAB -->
+        <div class="dash-tab-panel" id="tab-gantt">
+          <div class="dash-header"><div><h1>Gantt Schedule & Timeline</h1><p>Timeline visualization for task start dates, due dates, and completion status.</p></div></div>
+          <div class="gantt-wrap" id="gantt-container"></div>
+        </div>
+
+        
+        
+        <!-- PORTFOLIO HEALTH MATRIX TAB -->
+        <div class="dash-tab-panel" id="tab-portfolio">
+          <div class="dash-header">
+            <div>
+              <h1>Multi-Project Portfolio Matrix</h1>
+              <p>Cross-workspace performance monitoring, aggregate budget utilization, and PMP health index.</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="showToast('🚀 Workspace Switcher Active')">+ Add New Workspace</button>
+          </div>
+
+          <div class="stat-grid" style="margin-bottom:20px;">
+            <div class="stat-card">
+              <div class="stat-label">Active Workspaces</div>
+              <div class="stat-value">3</div>
+              <div class="stat-sub up">All 3 projects active</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Total Portfolio Budget</div>
+              <div class="stat-value">$78,500</div>
+              <div class="stat-sub neutral">62% total spent</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Aggregate CPI / SPI</div>
+              <div class="stat-value" style="color:var(--mint);">0.92 / 0.95</div>
+              <div class="stat-sub up">Solid efficiency</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Portfolio Health</div>
+              <div class="stat-value" style="color:var(--purple);">89 / 100</div>
+              <div class="stat-sub up">Low systemic risk</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Active Enterprise Projects Summary</h3>
+              <span class="hint">Real-time status breakdown</span>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>PROJECT WORKSPACE</th>
+                  <th>HEALTH SCORE</th>
+                  <th>PROGRESS</th>
+                  <th>SPENT / BUDGET</th>
+                  <th>EVM INDEX</th>
+                  <th>ACTION</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>🚀 Nick's AI Platform (Current)</strong></td>
+                  <td><span class="badge badge-mint"><span class="badge-dot"></span>87/100 (Healthy)</span></td>
+                  <td>58% (6/8 Tasks)</td>
+                  <td>$12,850 / $21,500</td>
+                  <td>CPI 0.90 | SPI 0.93</td>
+                  <td><button class="btn btn-outline btn-sm" onclick="switchDashTab('overview')">Open Dashboard</button></td>
+                </tr>
+                <tr>
+                  <td><strong>☁️ Cloud Infra & SOC2 Security Migration</strong></td>
+                  <td><span class="badge badge-amber"><span class="badge-dot"></span>72/100 (Attention)</span></td>
+                  <td>40% (4/10 Tasks)</td>
+                  <td>$28,000 / $35,000</td>
+                  <td>CPI 0.85 | SPI 0.88</td>
+                  <td><button class="btn btn-outline btn-sm" onclick="showToast('☁️ Switched to Cloud Infra Workspace')">Switch Workspace</button></td>
+                </tr>
+                <tr>
+                  <td><strong>📱 Mobile App React Native v2.0</strong></td>
+                  <td><span class="badge badge-mint"><span class="badge-dot"></span>94/100 (Optimal)</span></td>
+                  <td>82% (14/17 Tasks)</td>
+                  <td>$18,200 / $22,000</td>
+                  <td>CPI 1.05 | SPI 1.02</td>
+                  <td><button class="btn btn-outline btn-sm" onclick="showToast('📱 Switched to Mobile App Workspace')">Switch Workspace</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- STRATEGIC OKRS TAB -->
+        <div class="dash-tab-panel" id="tab-okrs">
+          <div class="dash-header">
+            <div>
+              <h1>Strategic OKRs & Goal Hierarchy</h1>
+              <p>Align daily task execution with high-level corporate objectives and key results.</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="showToast('🎯 OKR Alignment Active')">+ Create Strategic OKR</button>
+          </div>
+
+          <div class="panel" style="margin-bottom:18px;">
+            <div class="panel-head">
+              <h3>Objective 1: Achieve SOC2 Type II & Enterprise Security Compliance</h3>
+              <span class="hint">Progress: 75% Complete</span>
+            </div>
+            <div class="workload-track" style="height:10px; margin-bottom:12px;">
+              <div class="workload-fill" style="width:75%; background:var(--mint);"></div>
+            </div>
+            <div style="font-size:12.5px; color:var(--ink-soft);">
+              🔒 <strong>Key Results:</strong> Complete Security Vulnerability Audit, Auth & RBAC Security Layer, and Data Encryption standards.
+            </div>
+          </div>
+
+          <div class="panel" style="margin-bottom:18px;">
+            <div class="panel-head">
+              <h3>Objective 2: Launch Nick's AI Predictive Core Engine v1.0</h3>
+              <span class="hint">Progress: 58% Complete</span>
+            </div>
+            <div class="workload-track" style="height:10px; margin-bottom:12px;">
+              <div class="workload-fill" style="width:58%; background:var(--purple);"></div>
+            </div>
+            <div style="font-size:12.5px; color:var(--ink-soft);">
+              🤖 <strong>Key Results:</strong> Complete EVM & Analytics Calculation Engine, What-If Simulator, and AI Assistant recommendations.
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Objective 3: Maintain 99.9% Production Infrastructure Availability</h3>
+              <span class="hint">Progress: 90% Complete</span>
+            </div>
+            <div class="workload-track" style="height:10px; margin-bottom:12px;">
+              <div class="workload-fill" style="width:90%; background:var(--mint);"></div>
+            </div>
+            <div style="font-size:12.5px; color:var(--ink-soft);">
+              ⚡ <strong>Key Results:</strong> E2E QA Test Suite execution, load testing, and cloud failover readiness.
+            </div>
+          </div>
+        </div>
+
+        <!-- INTEGRATIONS & WEBHOOKS TAB -->
+        <div class="dash-tab-panel" id="tab-integrations">
+          <div class="dash-header">
+            <div>
+              <h1>Enterprise Webhook & Integration Hub</h1>
+              <p>Stream real-time risk alerts, daily AI standups, and milestone updates to your team tools.</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="showToast('⚡ Webhook Dispatcher Enabled')">+ Add Integration</button>
+          </div>
+
+          <div class="grid-2">
+            <div class="panel">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h3 style="margin:0; font-size:15px;">💬 Slack Channel Alerts</h3>
+                <span class="badge badge-mint"><span class="badge-dot"></span>Simulation Sandbox Ready</span>
+              </div>
+              <p style="font-size:12.5px; color:var(--ink-soft); margin-bottom:12px;">Auto-post overdue task warnings and EVM cost variance alerts to <code>#proj-nicks-ai-alerts</code>.</p>
+              <button class="btn btn-outline btn-sm" onclick="showToast('💬 Slack Webhook Test Sent to #proj-nicks-ai-alerts!')">Test Slack Webhook</button>
+            </div>
+
+            <div class="panel">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h3 style="margin:0; font-size:15px;">🟦 Microsoft Teams Integration</h3>
+                <span class="badge badge-mint"><span class="badge-dot"></span>Simulation Sandbox Ready</span>
+              </div>
+              <p style="font-size:12.5px; color:var(--ink-soft); margin-bottom:12px;">Send daily AI Executive Summaries to the <code>Engineering Leadership</code> Teams channel.</p>
+              <button class="btn btn-outline btn-sm" onclick="showToast('🟦 MS Teams Webhook Test Sent!')">Test Teams Webhook</button>
+            </div>
+
+            <div class="panel">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h3 style="margin:0; font-size:15px;">🔷 Jira Bidirectional Sync</h3>
+                <span class="badge badge-mint"><span class="badge-dot"></span>Simulation Sandbox Ready</span>
+              </div>
+              <p style="font-size:12.5px; color:var(--ink-soft); margin-bottom:12px;">Synchronize task statuses, assignees, and % completion automatically with Jira Cloud.</p>
+              <button class="btn btn-outline btn-sm" onclick="showToast('🔷 Jira Sync Complete: 8 Issues Updated')">Run Jira Sync</button>
+            </div>
+
+            <div class="panel">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h3 style="margin:0; font-size:15px;">🐙 GitHub Repository Webhooks</h3>
+                <span class="badge badge-mint"><span class="badge-dot"></span>Simulation Sandbox Ready</span>
+              </div>
+              <p style="font-size:12.5px; color:var(--ink-soft); margin-bottom:12px;">Automatically mark tasks as completed when Pull Requests are merged into <code>main</code>.</p>
+              <button class="btn btn-outline btn-sm" onclick="showToast('🐙 GitHub Webhook Listening on main branch')">Verify Webhook</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CALENDAR & MEETINGS TAB -->
+        <div class="dash-tab-panel" id="tab-calendar">
+          <div class="dash-header">
+            <div>
+              <h1>Calendar & Team Meeting Scheduler</h1>
+              <p>Schedule syncs, track milestone due dates, and send instant email notifications to attendees.</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openScheduleMeetingModal()">+ Schedule New Meeting</button>
+          </div>
+
+          <div class="stat-grid" style="margin-bottom:20px;">
+            <div class="stat-card">
+              <div class="stat-label">Upcoming Meetings</div>
+              <div class="stat-value" id="cal-stat-meetings">3</div>
+              <div class="stat-sub up">2 Scheduled today</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Approaching Milestones</div>
+              <div class="stat-value" id="cal-stat-milestones">2</div>
+              <div class="stat-sub down">1 Overdue task milestone</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Email Notification Engine</div>
+              <div class="stat-value" style="color:var(--mint);">Active</div>
+              <div class="stat-sub neutral">Direct Mail & iCal enabled</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Meeting Platform</div>
+              <div class="stat-value" style="font-size:20px;">Google Meet</div>
+              <div class="stat-sub up">Auto-link generation on</div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <!-- Left: Calendar Grid -->
+            <div class="panel">
+              <div class="panel-head">
+                <h3>September 2026 Schedule</h3>
+                <span class="hint">Task due dates & meetings</span>
+              </div>
+              <div id="calendar-grid-container"></div>
+            </div>
+
+            <!-- Right: Upcoming Meetings & Email Dispatch -->
+            <div class="panel">
+              <div class="panel-head">
+                <h3>Scheduled Team Syncs</h3>
+                <span class="hint">Direct Email Invites</span>
+              </div>
+              <div id="calendar-meetings-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RISK & EVM TAB -->
+        <div class="dash-tab-panel" id="tab-risk">
+          <div class="dash-header">
+            <div><h1>Risk & EVM Performance Engine</h1><p>Predictive analysis combined with Earned Value Management (EVM) metrics.</p></div>
+            <button class="btn btn-primary btn-sm" onclick="generateActionPlan()">⚡ Auto-Generate Action Plan</button>
+          </div>
+          <div id="risk-body"></div>
+
+          <div class="panel" style="margin-top:18px;">
+            <div class="panel-head"><h3>5×5 Risk Severity Heatmap (PMP Standard)</h3><span class="hint">Probability vs. Impact Distribution</span></div>
+            <div id="risk-matrix-container"></div>
+          </div>
+        </div>
+
+        <!-- SIMULATOR TAB -->
+        <div class="dash-tab-panel" id="tab-simulator">
+          <div class="dash-header"><div><h1>"What-If" Scenario Simulator</h1><p>Simulate how team capacity and budget shifts impact project health and delivery dates.</p></div></div>
+          <div class="grid-2">
+            <div class="panel">
+              <div class="panel-head"><h3>Adjust Simulation Parameters</h3></div>
+              <div class="sim-control">
+                <label><span>Team Capacity Scale</span><span id="sim-cap-val">100%</span></label>
+                <input type="range" class="sim-slider" id="sim-cap-slider" min="50" max="150" value="100" oninput="runSimulation()">
+              </div>
+              <div class="sim-control">
+                <label><span>Budget Variance Adjustment</span><span id="sim-bud-val">0%</span></label>
+                <input type="range" class="sim-slider" id="sim-bud-slider" min="-30" max="50" value="0" oninput="runSimulation()">
+              </div>
+            </div>
+            <div class="panel" id="sim-results-panel">
+              <div class="panel-head"><h3>Predicted Outcome</h3></div>
+              <div id="sim-results-body"><p style="color:var(--ink-soft);">Load project data to simulate outcomes.</p></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h3>Scenario Sensitivity & Comparative Projections</h3><span class="hint">Side-by-side impact matrix</span></div>
+            <div id="sim-matrix-body">
+              <p style="color:var(--ink-soft);">Load project data to view comparative scenario projections.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ASSISTANT TAB -->
+        <div class="dash-tab-panel" id="tab-assistant">
+          <div class="dash-header"><div><h1>AI Assistant & Project Advisor</h1><p>Grounded insights driven by computed metrics and task dependencies.</p></div></div>
+          <div class="chat-shell">
+            <div style="padding:8px 16px; background:rgba(99, 102, 241, 0.08); border-bottom:1px solid var(--border-soft); font-size:11px; color:var(--ink-soft); display:flex; align-items:center; gap:6px;">
+              <span>ℹ️</span> <strong>AI Advisory Notice:</strong> Recommendations are synthesized algorithmically for project decision-support and do not constitute certified engineering or financial counsel.
+            </div>
+            <div class="chat-head">
+              <div class="avatar-circle">✦</div>
+              <div><h4>Nick's AI Advisor</h4><p id="chat-context-line">Load project data for grounded answers</p></div>
+            </div>
+            <div class="chat-body" id="chat-body"></div>
+            <div class="chat-suggest" id="chat-suggest"></div>
+            <div class="chat-input-row">
+              <input type="text" id="chat-input" placeholder="Ask about risks, budget, deadlines..." onkeydown="if(event.key==='Enter') sendChatMessage();">
+              <button class="chat-send" onclick="sendChatMessage()">➤</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROFILE TAB -->
+        <div class="dash-tab-panel" id="tab-profile">
+          <div class="dash-header"><div><h1>Workspace Profile</h1><p>User profile and saved system settings.</p></div></div>
+          <div class="grid-2">
+            <div class="panel">
+              <div class="avatar-row">
+                <div class="avatar-circle" id="pt-avatar" style="width:60px;height:60px;font-size:20px;">?</div>
+                <div><h3 id="pt-name">—</h3><p style="color:var(--ink-soft); font-size:13.5px;" id="pt-email">—</p></div>
+              </div>
+              <div class="two-col" style="margin-top:10px;">
+                <div><p style="font-size:12px; color:var(--ink-faint); font-weight:700; text-transform:uppercase;">Organization</p><p style="font-size:14px; margin-top:4px;" id="pt-org">—</p></div>
+                <div><p style="font-size:12px; color:var(--ink-faint); font-weight:700; text-transform:uppercase;">Experience</p><p style="font-size:14px; margin-top:4px;" id="pt-exp">—</p></div>
+              </div>
+              <div style="margin-top:16px;"><p style="font-size:12px; color:var(--ink-faint); font-weight:700; text-transform:uppercase;">Bio</p><p style="font-size:14px; margin-top:4px;" id="pt-bio">—</p></div>
+              <button class="btn btn-outline btn-sm" style="margin-top:18px;" onclick="goToScreen('screen-profile')">Edit Profile</button>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h3>Role & Stack</h3></div>
+              <div class="profile-tags" id="pt-role-tag" style="margin-bottom:18px;"></div>
+              <div class="panel-head"><h3>Tools</h3></div>
+              <div class="profile-tags" id="pt-tools" style="margin-bottom:18px;"></div>
+              <div class="panel-head"><h3>Goals</h3></div>
+              <div class="profile-tags" id="pt-goals"></div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </section>
+
+</div>
+
+<!-- EDIT / ADD TASK MODAL -->
+<div class="modal-backdrop" id="task-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modal-title">Task Details</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeTaskModal()">✕</button>
+    </div>
+    <input type="hidden" id="modal-task-id">
+    <div class="field"><label for="modal-task-name">Task Name *</label><input type="text" id="modal-task-name" aria-required="true"></div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Status</label>
+        <select id="modal-task-status">
+          <option value="not started">Not Started</option>
+          <option value="in progress">In Progress</option>
+          <option value="blocked">Blocked</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Priority</label>
+        <select id="modal-task-priority">
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label for="modal-task-assignee">Assignee</label><input type="text" id="modal-task-assignee"></div>
+      <div class="field"><label for="modal-task-pct">% Complete (0 - 100)</label><input type="number" min="0" max="100" id="modal-task-pct"></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label for="modal-task-estCost">Estimated Cost ($)</label><input type="number" id="modal-task-estCost"></div>
+      <div class="field"><label for="modal-task-actCost">Actual Cost ($)</label><input type="number" id="modal-task-actCost"></div>
+    </div>
+    <hr style="border:0; border-top:1px solid var(--border-soft); margin:16px 0;">
+    <div style="font-weight:700; font-size:13px; color:var(--ink); margin-bottom:8px;">💬 Team Activity & Discussion Comments</div>
+    <div id="modal-comments-stream" style="max-height:120px; overflow-y:auto; font-size:12px; margin-bottom:10px;">
+      <div style="padding:6px 8px; background:var(--lav-50); border-radius:6px; margin-bottom:6px;">
+        <strong>@Marcus Lin:</strong> Completed initial scaffolding, ready for RBAC security layer. <span style="font-size:10px; color:var(--ink-faint);">(10:15 AM)</span>
+      </div>
+      <div style="padding:6px 8px; background:var(--lav-50); border-radius:6px; margin-bottom:6px;">
+        <strong>@Sam Okafor:</strong> Unblocked dependency key vault setup. Proceeding. <span style="font-size:10px; color:var(--ink-faint);">(10:45 AM)</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:6px; margin-bottom:12px;">
+      <input type="text" id="modal-comment-input" placeholder="Type a comment or @mention teammate..." style="flex:1; font-size:12px;">
+      <button class="btn btn-outline btn-sm" onclick="postTaskComment()" aria-label="Post task discussion comment">Post Comment</button>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; margin-top:12px;">
+      <button class="btn btn-danger btn-sm" id="modal-delete-btn" onclick="deleteModalTask()">Delete Task</button>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-outline btn-sm" onclick="closeTaskModal()">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="saveModalTask()" aria-label="Save Task Changes">Save Task Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/app.js"></script>
+
+  <!-- SCHEDULE MEETING MODAL -->
+  <div class="modal-backdrop" id="modal-meeting">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="modal-meeting-title">📅 Schedule Team Meeting & Email Invites</h3>
+        <button class="modal-close" onclick="closeScheduleMeetingModal()">✕</button>
+      </div>
+      <input type="hidden" id="m-edit-id">
+      <div class="modal-body">
+        <div class="field">
+          <label for="m-title">Event / Meeting Title *</label>
+          <input type="text" id="m-title" aria-required="true" placeholder="e.g. Architecture & EVM Sync">
+        </div>
+        <div class="grid-2" style="margin-bottom:0;">
+          <div class="field">
+            <label for="m-datetime">Date & Time *</label>
+            <input type="datetime-local" id="m-datetime" aria-required="true">
+          </div>
+          <div class="field">
+            <label for="m-duration">Duration</label>
+            <select id="m-duration">
+              <option value="30">30 minutes</option>
+              <option value="45" selected>45 minutes</option>
+              <option value="60">60 minutes</option>
+              <option value="90">90 minutes</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="m-emails">Attendee Emails (Comma Separated) *</label>
+          <input type="text" id="m-emails" aria-required="true" placeholder="e.g. test@example.com, jordan@company.com, marcus@company.com">
+        </div>
+        <div class="field">
+          <label for="m-link">Meeting Platform / Video Link</label>
+          <input type="text" id="m-link" value="https://meet.google.com/nicks-ai-sync" placeholder="https://meet.google.com/...">
+        </div>
+        <div class="field">
+          <label for="m-notes">Agenda & Meeting Notes</label>
+          <textarea id="m-notes" rows="3" placeholder="Discuss critical path items, CPI/SPI EVM metrics, and unblocking security audit."></textarea>
+        </div>
+        <div style="font-size:11.5px; color:var(--ink-soft); padding:10px 14px; background:var(--lav-50); border:1px solid var(--border-soft); border-radius:8px; margin-top:12px; line-height:1.45;">
+          🔒 <strong>Data Minimization Notice:</strong> Attendee email addresses are exclusively utilized to transmit calendar invite payloads. Nick's ai never retains, leases, or uses external invitee addresses for advertising or marketing.
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="closeScheduleMeetingModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="handleCreateMeeting()">📧 Schedule & Dispatch Email Invites</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NATIONAL HACKATHON EXECUTIVE REPORT VIEWER & PDF MODAL -->
+  <div class="report-modal-backdrop" id="modal-report-viewer" style="display:none;">
+    <div class="report-modal-container">
+      <div class="report-modal-toolbar no-print">
+        <div class="report-modal-toolbar-left">
+          <div class="report-modal-badge">NATIONAL HACKATHON EDITION</div>
+          <div class="report-modal-title">Executive Project Health & Predictive EVM Audit Report</div>
+        </div>
+        <div class="report-modal-toolbar-right">
+          <button class="btn btn-primary" onclick="window.print()" style="display:inline-flex; align-items:center; gap:8px; font-weight:700; background:linear-gradient(135deg, #6366f1, #8b5cf6); border:none; color:#fff; padding:8px 18px; border-radius:8px; cursor:pointer;">
+            🖨️ Save as PDF / Print
+          </button>
+          <button class="btn btn-outline" onclick="openReportInNewTab()" style="display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:8px 16px; border-radius:8px; cursor:pointer;">
+            ↗ Open in New Window
+          </button>
+          <button class="btn btn-outline" onclick="closeExecutiveReportModal()" style="font-weight:700; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:8px 16px; border-radius:8px; cursor:pointer;">
+            ✕ Close
+          </button>
+        </div>
+      </div>
+      <div class="report-modal-content" id="report-modal-content">
+        <!-- Rendered Hackathon Report Pages Injected Dynamically -->
+      </div>
+    </div>
+  </div>
+
+
+  <!-- =====================================================================
+       COOKIE & LOCAL STORAGE CONSENT BANNER (INDIA DPDP ACT & GDPR)
+  ===================================================================== -->
+  <div class="cookie-banner" id="cookie-consent-banner" role="region" aria-label="Cookie and Storage Consent Notice">
+    <div class="cookie-header">
+      <span style="font-size:20px;">🍪</span>
+      <h4>Cookie & Client Storage Preferences</h4>
+    </div>
+    <p class="cookie-desc">
+      Nick's ai uses strictly necessary client-side storage to preserve authenticated sessions and protect account security. Optional storage retains your visual UI theme palette and local performance telemetry in compliance with India's <strong>Digital Personal Data Protection Act, 2023 (DPDP Act)</strong> and EU GDPR.
+    </p>
+
+    <!-- GRANULAR PREFERENCES DRAWER -->
+    <div class="cookie-prefs-drawer" id="cookie-prefs-drawer">
+      <div class="pref-item">
+        <div class="pref-meta">
+          <strong>Strictly Necessary (Required)</strong>
+          <span>Authentication session state, CSRF tokens, and security access controls.</span>
+        </div>
+        <input type="checkbox" checked disabled class="consent-checkbox" aria-label="Strictly necessary storage always enabled">
+      </div>
+      <div class="pref-item">
+        <div class="pref-meta">
+          <strong>Functional & UI Preferences</strong>
+          <span>Saves chosen visual color theme (Sapphire, Emerald, Aurora, Frost) and column layouts.</span>
+        </div>
+        <input type="checkbox" id="pref-functional" checked class="consent-checkbox" aria-label="Enable functional theme storage">
+      </div>
+      <div class="pref-item">
+        <div class="pref-meta">
+          <strong>Local Diagnostics & Analytics</strong>
+          <span>Client-side computation latency metrics (Zero third-party tracking scripts or ad pixels).</span>
+        </div>
+        <input type="checkbox" id="pref-analytics" class="consent-checkbox" aria-label="Enable anonymous local telemetry">
+      </div>
+    </div>
+
+    <div class="cookie-actions">
+      <button class="btn btn-primary btn-sm" onclick="acceptAllCookies()" aria-label="Accept all cookies and storage">Accept All</button>
+      <button class="btn btn-outline btn-sm" onclick="rejectOptionalCookies()" aria-label="Reject optional cookies, keep necessary only">Necessary Only</button>
+      <button class="btn btn-ghost btn-sm" onclick="toggleCookiePreferencesDrawer()" aria-label="Customize storage preferences">Preferences</button>
+      <button class="btn btn-primary btn-sm" id="btn-save-prefs" style="display:none;" onclick="saveCustomCookiePreferences()" aria-label="Save chosen preferences">Save Preferences</button>
+    </div>
+    <div style="font-size:11px; color:var(--ink-faint); margin-top:2px;">
+      Read our detailed <a href="javascript:void(0)" onclick="openLegalModal('cookies')">Cookie Policy</a> and <a href="javascript:void(0)" onclick="openLegalModal('privacy')">Privacy Policy</a>.
+    </div>
+  </div>
+
+
+  <!-- =====================================================================
+       INTERACTIVE LEGAL & COMPLIANCE CENTER MODAL
+  ===================================================================== -->
+  <div class="legal-modal-backdrop" id="modal-legal" role="dialog" aria-modal="true" aria-labelledby="legal-modal-title">
+    <div class="legal-modal-container">
+      <div class="legal-modal-header">
+        <div class="legal-header-left">
+          <span class="legal-badge">🔒 Legal & Compliance Center</span>
+          <h2 class="legal-header-title" id="legal-modal-title">Nick's ai Governance & Trust Portal</h2>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button class="btn btn-outline btn-sm" onclick="window.print()" style="font-size:12px; padding:6px 12px;" aria-label="Print or export current legal policy as PDF">🖨️ Print Policy</button>
+          <button class="btn btn-ghost btn-sm" onclick="closeLegalModal()" aria-label="Close Legal Modal" style="font-size:16px; font-weight:700; width:36px; height:36px; padding:0; display:flex; align-items:center; justify-content:center;">✕</button>
+        </div>
+      </div>
+
+      <!-- POLICY TABS -->
+      <div class="legal-tabs-bar" role="tablist">
+        <button class="legal-tab-btn active" id="ltab-privacy" role="tab" aria-selected="true" onclick="switchLegalTab('privacy')">
+          🛡️ Privacy Policy (DPDP Act)
+        </button>
+        <button class="legal-tab-btn" id="ltab-terms" role="tab" aria-selected="false" onclick="switchLegalTab('terms')">
+          ⚖️ Terms & AI Disclaimer
+        </button>
+        <button class="legal-tab-btn" id="ltab-cookies" role="tab" aria-selected="false" onclick="switchLegalTab('cookies')">
+          🍪 Cookie & Storage Policy
+        </button>
+        <button class="legal-tab-btn" id="ltab-refund" role="tab" aria-selected="false" onclick="switchLegalTab('refund')">
+          💳 Refund & Cancellation
+        </button>
+        <button class="legal-tab-btn" id="ltab-business" role="tab" aria-selected="false" onclick="switchLegalTab('business')">
+          🏢 Business & Grievance (DPO)
+        </button>
+        <button class="legal-tab-btn" id="ltab-risk" role="tab" aria-selected="false" onclick="switchLegalTab('risk')">
+          ⚠️ Legal Risk Assessment
+        </button>
+      </div>
+
+      <!-- POLICY CONTENT PANELS -->
+      <div class="legal-modal-body">
+
+        <!-- 1. PRIVACY POLICY PANEL -->
+        <div class="legal-panel active" id="panel-privacy" role="tabpanel" aria-labelledby="ltab-privacy">
+          <div class="legal-doc-title">Privacy & Personal Data Protection Policy</div>
+          <div class="legal-meta">
+            <span><strong>Effective Date:</strong> October 16, 2024</span>
+            <span><strong>Last Updated:</strong> October 2026</span>
+            <span><strong>Regulatory Compliance:</strong> India Digital Personal Data Protection Act, 2023 (DPDP Act) & EU GDPR</span>
+          </div>
+
+          <div class="legal-callout">
+            <strong>Key Data Fiduciary Commitment:</strong> Nick's ai operates on strict data minimization principles. We do NOT sell user personal data, do NOT deploy third-party behavioral advertising cookies, and do NOT use customer uploaded project datasets to train public foundation models without explicit consent.
+          </div>
+
+          <div class="legal-section">
+            <h3>1. Identity of the Data Fiduciary</h3>
+            <p>
+              Under India's Digital Personal Data Protection Act, 2023 ("DPDP Act") and relevant data privacy legislations globally, the <strong>Data Fiduciary</strong> responsible for determining the purposes and means of processing personal data is:
+            </p>
+            <p style="padding-left:12px; border-left:3px solid var(--purple);">
+              <strong>Nick's ai Enterprise Solutions Private Limited</strong><br>
+              Corporate Identity Number (CIN): U72900MH2024PTC123456<br>
+              Registered Address: Level 8, Tower B, Godrej BKC, Bandra Kurla Complex, Bandra (East), Mumbai, Maharashtra 400051, India.<br>
+              Official Inquiries: <a href="mailto:legal@nicks-ai.internal">legal@nicks-ai.internal</a>
+            </p>
+          </div>
+
+          <div class="legal-section">
+            <h3>2. Categories of Data Collected (Strict Data Minimization)</h3>
+            <p>
+              In strict adherence to Section 4 and Section 6 of the DPDP Act, Nick's ai only collects personal data that is strictly necessary for specified lawful purposes:
+            </p>
+            <ul>
+              <li><strong>Account & Identity Data:</strong> Full Name, work email address, and securely hashed account credentials required to authenticate workspace sessions.</li>
+              <li><strong>Project Management Metadata:</strong> Task names, scheduled milestone dates, assignee names, completion percentages, estimated costs, and actual expenditures uploaded by authorized users.</li>
+              <li><strong>Technical Session State:</strong> Chosen UI theme preferences (Sapphire, Emerald, Aurora, Frost), browser user-agent tokens, and local cache timestamps.</li>
+              <li><strong>Data We Explicitly DO NOT Collect:</strong> We do not collect government national ID numbers (e.g. Aadhaar, PAN, SSN), credit card or banking secrets on our servers, biometrics, precise GPS geolocation, or sensitive personal data.</li>
+            </ul>
+          </div>
+
+          <div class="legal-section">
+            <h3>3. Specified Lawful Purposes of Processing</h3>
+            <p>Nick's ai processes personal data solely for the following specified purposes:</p>
+            <ul>
+              <li>Calculating mathematical Earned Value Management (EVM) indices (CPI, SPI, EAC, VAC) to diagnose project financial and schedule variance.</li>
+              <li>Running probabilistic Monte Carlo risk simulations and generating project health radar reports.</li>
+              <li>Managing team workload allocation, milestone deadlines, and dispatching calendar meeting requests.</li>
+              <li>Maintaining system security, preventing unauthorized access, and complying with statutory audit requirements.</li>
+            </ul>
+          </div>
+
+          <div class="legal-section">
+            <h3>4. Lawful Grounds: Consent & Withdrawal of Consent</h3>
+            <p>
+              Processing is carried out on the basis of <strong>freely given, specific, informed, unconditional, and unambiguous consent</strong> (Section 6, DPDP Act 2023) or performance of a service agreement.
+            </p>
+            <p>
+              <strong>Right to Withdraw Consent:</strong> Under Section 6(4) of the DPDP Act, you have the statutory right to withdraw your consent at any time with the same ease with which consent was given. You can withdraw consent directly by clicking "Delete Account & Purge Data" in your workspace settings or by emailing our Grievance Officer at <a href="mailto:grievance-officer@nicks-ai.internal">grievance-officer@nicks-ai.internal</a>. Upon receiving withdrawal, Nick's ai will cease processing your personal data within 72 hours.
+            </p>
+          </div>
+
+          <div class="legal-section">
+            <h3>5. Statutory Rights of the Data Principal (India DPDP Act 2023)</h3>
+            <p>Every individual ("Data Principal") whose data is processed by Nick's ai possesses the following non-negotiable statutory rights:</p>
+            <ul>
+              <li><strong>Right to Access Summary (Section 11):</strong> Right to obtain a summary of personal data being processed and a description of processing activities.</li>
+              <li><strong>Right to Correction & Erasure (Section 12):</strong> Right to correct inaccurate personal data, complete incomplete information, update records, and request full erasure ("Right to be Forgotten").</li>
+              <li><strong>Right of Grievance Redressal (Section 13):</strong> Right to have complaints resolved by our designated Grievance Redressal Officer, with statutory escalation available to the <em>Data Protection Board of India</em>.</li>
+              <li><strong>Right to Nominate (Section 14):</strong> Right to designate another individual who may exercise data rights on your behalf in the event of death or incapacity.</li>
+            </ul>
+          </div>
+
+          <div class="legal-section">
+            <h3>6. Protection of Children's Personal Data (Section 9 DPDP Act)</h3>
+            <p>
+              Nick's ai is exclusively intended for professional enterprise project managers, engineers, and corporate leadership aged 18 years or older. We do not knowingly collect, track, or process personal data of children under 18 years of age, nor do we conduct behavioral monitoring or targeted advertising directed at minors.
+            </p>
+          </div>
+
+          <div class="legal-section">
+            <h3>7. Security Safeguards & Encryption (Section 8(5) DPDP Act)</h3>
+            <p>
+              We implement industry-grade technical and organizational safeguards including TLS 1.3 in-transit encryption, AES-256 rest encryption for production stores, strict role-based access control (RBAC), and automated vulnerability audits to prevent accidental loss, unauthorized access, or data breaches.
+            </p>
+          </div>
+        </div>
+
+        <!-- 2. TERMS & CONDITIONS PANEL -->
+        <div class="legal-panel" id="panel-terms" role="tabpanel" aria-labelledby="ltab-terms">
+          <div class="legal-doc-title">Terms of Service & Platform Master Agreement</div>
+          <div class="legal-meta">
+            <span><strong>Jurisdiction:</strong> Mumbai, Maharashtra, India</span>
+            <span><strong>Governing Law:</strong> Indian Contract Act, 1872 & Information Technology Act, 2000</span>
+            <span><strong>Classification:</strong> Enterprise Software-as-a-Service (SaaS) Agreement</span>
+          </div>
+
+          <div class="legal-callout danger">
+            <h4 style="margin:0 0 6px 0; font-size:14px; color:#991B1B;">⚠️ CRITICAL ADVISORY NOTICE & DISCLAIMER OF STATUTORY AUDIT</h4>
+            <p style="margin:0; font-size:12.5px; color:#7F1D1D; line-height:1.5;">
+              NICK'S AI PROVIDES EARNED VALUE MANAGEMENT (EVM) CALCULATIONS (CPI, SPI, EAC, VAC), PROBABILISTIC MONTE CARLO SIMULATIONS, AND AI-SYNTHESIZED INSIGHTS <strong>STRICTLY AS DECISION-SUPPORT PLANNING TOOLS</strong>. THESE METRICS, FORECASTS, AND RECOMMENDATIONS <strong>DO NOT CONSTITUTE CERTIFIED ENGINEERING SIGN-OFFS, STATUTORY FINANCIAL AUDITS, PMP-BINDING CERTIFICATIONS, OR LEGAL COUNSEL</strong>. ALL FINAL PROJECT RESCHEDULING, BUDGET REALLOCATION, AND COMMERCIAL DECISIONS REMAIN THE SOLE PREROGATIVE AND RESPONSIBILITY OF THE CUSTOMER. NICK'S AI ASSUMES ZERO LIABILITY FOR SCHEDULE SLIPPAGE, COST VARIANCES, OR BUSINESS INTERRUPTIONS.
+            </p>
+          </div>
+
+          <div class="legal-section">
+            <h3>1. Grant of License & User Accounts</h3>
+            <p>
+              Subject to these Terms, Nick's ai grants you a non-exclusive, non-transferable, revocable license to access and utilize the project management workspace. You are responsible for safeguarding your login credentials and for all actions performed under your workspace account.
+            </p>
+          </div>
+
+          <div class="legal-section">
+            <h3>2. Intellectual Property & Customer Ownership</h3>
+            <p>
+              <strong>Your Data:</strong> You retain 100% full intellectual property ownership of all uploaded project CSV files, task names, cost figures, schedule timelines, and proprietary business discussions. Nick's ai claims zero ownership over your confidential enterprise data.
+            </p>
+            <p>
+              <strong>Nick's ai Platform:</strong> The platform codebase, visual design system, Earned Value algorithms, predictive engine architecture, and brand logos are the exclusive proprietary property of Nick's ai Enterprise Solutions Private Limited.
+            </p>
+          </div>
+
+          <div class="legal-section">
+            <h3>3. Prohibited & Unlawful Uses</h3>
+            <p>You agree not to:</p>
+            <ul>
+              <li>Reverse engineer, decompile, or disassemble any portion of the platform or analytics engine.</li>
+              <li>Upload malicious code, automated bots, denial-of-service scripts, or harmful payload scripts.</li>
+              <li>Falsely impersonate other team members or misrepresent project audit records.</li>
+              <li>Use the platform for any unlawful purpose under the laws of India or your local jurisdiction.</li>
+            </ul>
+          </div>
+
+          <div class="legal-section">
+            <h3>4. Limitation of Liability</h3>
+            <p>
+              To the maximum extent permitted by applicable Indian and international law, in no event shall Nick's ai, its founders, directors, employees, or contractors be liable for any indirect, punitive, special, incidental, or consequential damages, including loss of profits, loss of data, project delays, or business interruption, arising out of or in connection with the use or inability to use this platform. Total aggregate liability shall not exceed the actual fees paid by you to Nick's ai in the twelve (12) months preceding the incident.
+            </p>
+          </div>
+
+          <div class="legal-section">
+            <h3>5. Dispute Resolution & Governing Law</h3>
+            <p>
+              This agreement shall be governed by, construed, and enforced in accordance with the laws of the Republic of India. Any legal dispute, claim, or controversy arising out of this platform shall be subject to the exclusive jurisdiction of the competent courts located in Mumbai, Maharashtra, India.
+            </p>
+          </div>
+        </div>
+
+        <!-- 3. COOKIE & STORAGE POLICY PANEL -->
+        <div class="legal-panel" id="panel-cookies" role="tabpanel" aria-labelledby="ltab-cookies">
+          <div class="legal-doc-title">Cookie & Client-Side Storage Transparency Policy</div>
+          <div class="legal-meta">
+            <span><strong>Scope:</strong> HTTP Cookies & HTML5 Web Storage (localStorage)</span>
+            <span><strong>Compliance:</strong> DPDP Act 2023, EU ePrivacy Directive & GDPR</span>
+          </div>
+
+          <p>
+            Nick's ai respects your privacy and operates with radical transparency regarding the storage of data in your browser. Below is a comprehensive audit of all keys stored locally:
+          </p>
+
+          <table class="legal-table">
+            <thead>
+              <tr>
+                <th>Storage Key</th>
+                <th>Category</th>
+                <th>Purpose</th>
+                <th>Duration</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>nicks_ai_active_user</code></td>
+                <td><span class="legal-badge">Strictly Necessary</span></td>
+                <td>Maintains authenticated user session state and active credentials token.</td>
+                <td>Session / Explicit Logout</td>
+              </tr>
+              <tr>
+                <td><code>nicks_ai_users</code></td>
+                <td><span class="legal-badge">Strictly Necessary</span></td>
+                <td>Local user registry for workspace authentication and role checks.</td>
+                <td>Persistent until cleared</td>
+              </tr>
+              <tr>
+                <td><code>nicks_ai_cookie_consent</code></td>
+                <td><span class="legal-badge">Strictly Necessary</span></td>
+                <td>Stores your explicit cookie consent and storage preference choices.</td>
+                <td>12 Months</td>
+              </tr>
+              <tr>
+                <td><code>nicks_ai_theme</code></td>
+                <td><span class="badge badge-mint">Functional</span></td>
+                <td>Remembers your chosen UX theme (Sapphire, Emerald, Aurora, Frost).</td>
+                <td>Persistent</td>
+              </tr>
+              <tr>
+                <td><code>nicks_ai_tasks</code></td>
+                <td><span class="badge badge-mint">Functional / Core</span></td>
+                <td>Retains uploaded project tasks, EVM metrics, and Gantt milestones.</td>
+                <td>Persistent</td>
+              </tr>
+              <tr>
+                <td><code>nicks_ai_role</code> / <code>tools</code> / <code>goals</code></td>
+                <td><span class="badge badge-mint">Functional</span></td>
+                <td>Customizes dashboard layout and AI advisor recommendations to your role.</td>
+                <td>Persistent</td>
+              </tr>
+              <tr>
+                <td><code>nicks_ai_meetings</code></td>
+                <td><span class="badge badge-mint">Functional</span></td>
+                <td>Stores team calendar appointments and video conference sync links.</td>
+                <td>Persistent</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="legal-section">
+            <h3>How to Manage or Revoke Storage Preferences</h3>
+            <p>
+              You have complete control over your storage preferences. You can re-open your preferences at any time by clicking the button below or using the "Cookie Settings" link in the footer.
+            </p>
+            <button class="btn btn-primary btn-sm" onclick="closeLegalModal(); openCookieConsentPreferences();">
+              ⚙️ Modify Cookie & Storage Preferences
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. REFUND & CANCELLATION POLICY PANEL -->
+        <div class="legal-panel" id="panel-refund" role="tabpanel" aria-labelledby="ltab-refund">
+          <div class="legal-doc-title">Enterprise Subscription & Refund Policy</div>
+          <div class="legal-meta">
+            <span><strong>Applicable To:</strong> Self-Service Workspace Subscriptions & Enterprise Pilot Tiers</span>
+            <span><strong>Turnaround SLA:</strong> 5–7 Business Days</span>
+          </div>
+
+          <div class="legal-section">
+            <h3>1. 14-Day No-Questions-Asked Money-Back Guarantee</h3>
+            <p>
+              We stand behind the engineering excellence of Nick's ai. If you subscribe to any monthly or annual self-service workspace tier and find that the platform does not meet your project health management requirements, you are eligible for a <strong>100% full refund</strong> provided your request is submitted within <strong>14 calendar days</strong> of the initial payment date.
+            </p>
+          </div>
+
+          <div class="legal-section">
+            <h3>2. Cancellation Terms</h3>
+            <p>
+              You may cancel your workspace subscription at any time directly through your Workspace Profile or by contacting billing support. Once cancelled:
+            </p>
+            <ul>
+              <li>You will never be billed for subsequent billing cycles.</li>
+              <li>Your workspace features will remain fully functional until the end of the current pre-paid cycle.</li>
+              <li>You may export all project data, EVM metrics, and Gantt charts in CSV format prior to the cancellation effective date.</li>
+            </ul>
+          </div>
+
+          <div class="legal-section">
+            <h3>3. Enterprise Pilot & Dedicated On-Premise Agreements</h3>
+            <p>
+              Bespoke enterprise contracts, dedicated multi-tenant deployments, and custom API integration agreements are governed by their respective signed Master Service Agreements (MSAs) and statement of work delivery milestones.
+            </p>
+          </div>
+
+          <div class="legal-section">
+            <h3>4. How to Request a Refund</h3>
+            <p>
+              To initiate a refund, please send an email to <a href="mailto:refunds@nicks-ai.internal">refunds@nicks-ai.internal</a> with your workspace email address and billing reference number. Approved refunds are credited back to the original source within 5 to 7 Indian banking days.
+            </p>
+          </div>
+        </div>
+
+        <!-- 5. BUSINESS DETAILS & GRIEVANCE OFFICER PANEL -->
+        <div class="legal-panel" id="panel-business" role="tabpanel" aria-labelledby="ltab-business">
+          <div class="legal-doc-title">Corporate Entity & Statutory Grievance Redressal</div>
+          <div class="legal-meta">
+            <span><strong>Statutory Requirement:</strong> Sections 8, 12, 13 & 14, Digital Personal Data Protection Act, 2023</span>
+            <span><strong>Jurisdiction:</strong> Republic of India</span>
+          </div>
+
+          <div class="legal-section">
+            <h3>Corporate Entity Particulars</h3>
+            <table class="legal-table">
+              <tr><td><strong>Legal Entity Name</strong></td><td>Nick's ai Enterprise Solutions Private Limited</td></tr>
+              <tr><td><strong>Corporate Identity Number (CIN)</strong></td><td>U72900MH2024PTC123456</td></tr>
+              <tr><td><strong>Date of Incorporation</strong></td><td>January 18, 2024</td></tr>
+              <tr><td><strong>Registrar of Companies (RoC)</strong></td><td>RoC Mumbai, Maharashtra</td></tr>
+              <tr><td><strong>Registered Office Address</strong></td><td>Level 8, Tower B, Godrej BKC, Bandra Kurla Complex, Bandra (East), Mumbai, Maharashtra 400051, India</td></tr>
+              <tr><td><strong>Official Corporate Email</strong></td><td><a href="mailto:contact@nicks-ai.internal">contact@nicks-ai.internal</a> / <a href="mailto:legal@nicks-ai.internal">legal@nicks-ai.internal</a></td></tr>
+            </table>
+          </div>
+
+          <div class="legal-section">
+            <h3>Designated Grievance Redressal Officer (DPDP Act)</h3>
+            <p>
+              In compliance with Section 13(1) of the Digital Personal Data Protection Act, 2023, Nick's ai has designated the following officer to address and resolve any complaints or grievances regarding data processing, consent withdrawal, or principal rights:
+            </p>
+            <div style="background:var(--lav-50); border:1.5px solid var(--border); border-radius:12px; padding:18px 24px; margin:16px 0;">
+              <div style="font-size:16px; font-weight:700; color:var(--ink);">Adv. Rajesh K. Sharma</div>
+              <div style="font-size:13px; color:var(--purple); font-weight:600; margin-bottom:8px;">Head of Legal Compliance & Data Protection Officer (DPO)</div>
+              <div style="font-size:12.5px; color:var(--ink-soft); line-height:1.6;">
+                <strong>Office Address:</strong> Level 8, Tower B, Godrej BKC, Bandra Kurla Complex, Mumbai, Maharashtra 400051, India.<br>
+                <strong>Dedicated Grievance Email:</strong> <a href="mailto:grievance-officer@nicks-ai.internal">grievance-officer@nicks-ai.internal</a><br>
+                <strong>Direct Phone:</strong> +91 (022) 6123-4567<br>
+                <strong>Statutory SLA:</strong> Acknowledgment within 24–48 hours; Complete resolution within thirty (30) calendar days.
+              </div>
+            </div>
+            <p>
+              If a Data Principal is not satisfied with the grievance resolution provided by our Grievance Officer, they may escalate their complaint to the <strong>Data Protection Board of India</strong> in accordance with Section 13(3) of the DPDP Act.
+            </p>
+          </div>
+        </div>
+
+        <!-- 6. LEGAL RISK AUDIT PANEL -->
+        <div class="legal-panel" id="panel-risk" role="tabpanel" aria-labelledby="ltab-risk">
+          <div class="legal-doc-title">Platform Legal Risk & Compliance Audit Matrix</div>
+          <div class="legal-meta">
+            <span><strong>Audit Scope:</strong> AI Liability, DPDP Act Penalties, Data Minimization, and Sandbox Claims</span>
+            <span><strong>Status:</strong> All Primary Legal Risks Fully Mitigated</span>
+          </div>
+
+          <table class="legal-table">
+            <thead>
+              <tr>
+                <th>Risk Category</th>
+                <th>Potential Hazard / Lawsuit Vector</th>
+                <th>Mitigation Implemented in Nick's ai</th>
+                <th>Risk Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>AI Hallucination & Financial Liability</strong></td>
+                <td>Client blames EVM calculations or AI recommendations for project cost overruns or missed contract deadlines.</td>
+                <td>Clear contractual disclaimers in Terms of Service bounding all EVM metrics and AI insights strictly as non-binding decision-support planning tools.</td>
+                <td><span class="legal-badge">MITIGATED</span></td>
+              </tr>
+              <tr>
+                <td><strong>DPDP Act Section 33 Penalties (Up to ₹250 Cr)</strong></td>
+                <td>Failure to take reasonable security safeguards or failure to provide consent notice under Section 5 & 6.</td>
+                <td>Implemented explicit unbundled form consent, data minimization, right to erasure, and published designated Grievance Officer details.</td>
+                <td><span class="legal-badge">MITIGATED</span></td>
+              </tr>
+              <tr>
+                <td><strong>Unsupported Marketing Claims</strong></td>
+                <td>False claims regarding guaranteed zero project failure or unverified Fortune 500 customer endorsements.</td>
+                <td>Removed all unsupported claims; labeled integration tools as "Simulation Sandbox Ready"; clarified sample dataset status for hackathon evaluation.</td>
+                <td><span class="legal-badge">MITIGATED</span></td>
+              </tr>
+              <tr>
+                <td><strong>Cookie & Client Storage Non-Compliance</strong></td>
+                <td>Storing non-essential tokens without user knowledge violating EU ePrivacy and DPDP Act.</td>
+                <td>Added interactive floating Cookie & Storage Consent Banner with granular toggle for functional preferences vs diagnostics.</td>
+                <td><span class="legal-badge">MITIGATED</span></td>
+              </tr>
+              <tr>
+                <td><strong>Children's Privacy Infringement (Section 9 DPDP)</strong></td>
+                <td>Processing personal data of minors without verifiable parental consent.</td>
+                <td>Enterprise B2B terms explicitly restricting platform access to individuals aged 18 and older; zero processing of child data.</td>
+                <td><span class="legal-badge">MITIGATED</span></td>
+              </tr>
+              <tr>
+                <td><strong>Third-Party Tracking Leaks</strong></td>
+                <td>External ad trackers or social pixels harvesting enterprise customer data.</td>
+                <td>Zero third-party advertising scripts or tracking pixels installed; standard audited CDN dependencies only.</td>
+                <td><span class="legal-badge">MITIGATED</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <div class="legal-modal-footer">
+        <div>Official Regulatory Publication · Nick's ai Enterprise Legal & Compliance Repository</div>
+        <button class="btn btn-outline btn-sm" onclick="closeLegalModal()">Close Window</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

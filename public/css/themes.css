@@ -1,0 +1,27 @@
+/* Royal Purple & Lavender Light Desktop Theme (Locked Default) */
+:root {
+  --bg-primary: #f5f3ff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #ffffff;
+  --border-color: rgba(108, 70, 176, 0.12);
+  --border-soft: #e9d5ff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --purple: #6C46B0;
+  --purple-deep: #4E3286;
+  --purple-darker: #362161;
+  --accent-blue: #6C46B0;
+  --accent-cyan: #06b6d4;
+  --accent-emerald: #10b981;
+  --accent-purple: #8b5cf6;
+  --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+  --surface: #ffffff;
+  --lav-50: #faf5ff;
+  --lav-100: #f3e8ff;
+  --lav-200: #e9d5ff;
+  --ink: #0f172a;
+  --ink-soft: #475569;
+  --ink-faint: #64748b;
+  --shadow-sm: 0 4px 12px rgba(108, 70, 176, 0.06);
+}
