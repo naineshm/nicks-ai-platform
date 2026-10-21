@@ -439,6 +439,50 @@ function loadSampleData(){
   afterDataLoaded();
 }
 
+function loadCollegeData(){
+  fetch('college_of_engineering_dataset.csv')
+    .then(res => res.text())
+    .then(csvText => {
+      const rows = (typeof Papa !== 'undefined') 
+        ? Papa.parse(csvText, { header: true, skipEmptyLines: true }).data 
+        : fallbackParseCSV(csvText);
+      if(!rows || !rows.length) return;
+      state.tasks = rows.map((r, idx) => {
+        const nameVal = findKey(r, ['Task Name','Task','name','title','activity']) || ('Task ' + (idx+1));
+        const statusVal = findKey(r, ['Status','state']) || 'not started';
+        const startVal = findKey(r, ['Start Date','Start','begin date']);
+        const dueVal = findKey(r, ['Due Date','Due','end date','deadline']);
+        const pctVal = findKey(r, ['% Complete','Percent Complete','Progress','pct','% done']);
+        const priorityVal = findKey(r, ['Priority','severity']);
+        const assigneeVal = findKey(r, ['Assignee','Owner','assigned to']);
+        const estVal = findKey(r, ['Estimated Cost','Est Cost','planned cost','budget']);
+        const actVal = findKey(r, ['Actual Cost','Actual','spent','cost']);
+
+        return {
+          id: idx+1,
+          name: String(nameVal),
+          status: normalizeStatus(statusVal),
+          start: startVal ? new Date(startVal) : new Date(),
+          due: dueVal ? new Date(dueVal) : new Date(Date.now()+86400000*14),
+          pct: Math.min(100, Math.max(0, parseFloat(pctVal||0))),
+          priority: normalizePriority(priorityVal),
+          assignee: assigneeVal ? String(assigneeVal) : 'Unassigned',
+          estCost: parseFloat(estVal||1000),
+          actCost: parseFloat(actVal||500)
+        };
+      });
+      saveState();
+      showToast('🎓 Loaded College of Engineering Dataset (' + state.tasks.length + ' tasks)!');
+      const uploadStatus = document.getElementById('upload-status');
+      if(uploadStatus) uploadStatus.textContent = '✓ Loaded ' + state.tasks.length + ' College of Engineering tasks';
+      afterDataLoaded();
+    })
+    .catch(err => {
+      console.warn('Error loading college data:', err);
+      showToast('❌ Error loading College of Engineering dataset');
+    });
+}
+
 function afterDataLoaded(){
   document.getElementById('data-table-panel').style.display = 'block';
   state.analysis = analyzeProject(state.tasks);
