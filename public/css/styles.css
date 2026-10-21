@@ -1608,7 +1608,10 @@ textarea:focus-visible,
 }
 
 .cookie-banner.active {
-  display: flex;
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
 
 /* Dark Theme Palette Adaptation */

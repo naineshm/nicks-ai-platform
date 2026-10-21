@@ -2823,6 +2823,7 @@ document.addEventListener('DOMContentLoaded', function(){
   renderRoleGrid();
   renderToolsGrid();
   renderGoalsGrid();
+  initCookieConsent();
   if(state.user && state.user.email){ enterDashboard(); }
 });
 
@@ -3717,14 +3718,14 @@ function switchLegalTab(tabId) {
    COOKIE & LOCAL STORAGE CONSENT CONTROLLER (DPDP ACT & GDPR)
 ===================================================================== */
 function initCookieConsent() {
-  const consent = localStorage.getItem('nicks_ai_cookie_consent');
   const banner = document.getElementById('cookie-consent-banner');
   if(!banner) return;
 
-  if(!consent) {
-    setTimeout(() => {
-      banner.classList.add('active');
-    }, 600);
+  const dismissedInSession = sessionStorage.getItem('nicks_ai_cookie_dismissed_session');
+  if(dismissedInSession === 'true') {
+    banner.classList.remove('active');
+  } else {
+    banner.classList.add('active');
   }
 }
 
@@ -3735,7 +3736,8 @@ function acceptAllCookies() {
     analytics: true,
     timestamp: new Date().toISOString()
   };
-  localStorage.setItem('nicks_ai_cookie_consent', JSON.stringify(choice));
+  localStorage.setItem('nicks_ai_cookie_consent_v2', JSON.stringify(choice));
+  sessionStorage.setItem('nicks_ai_cookie_dismissed_session', 'true');
   const banner = document.getElementById('cookie-consent-banner');
   if(banner) banner.classList.remove('active');
   showToast('✓ Storage preferences recorded: All enabled.');
@@ -3748,7 +3750,8 @@ function rejectOptionalCookies() {
     analytics: false,
     timestamp: new Date().toISOString()
   };
-  localStorage.setItem('nicks_ai_cookie_consent', JSON.stringify(choice));
+  localStorage.setItem('nicks_ai_cookie_consent_v2', JSON.stringify(choice));
+  sessionStorage.setItem('nicks_ai_cookie_dismissed_session', 'true');
   const banner = document.getElementById('cookie-consent-banner');
   if(banner) banner.classList.remove('active');
   showToast('✓ Storage preferences recorded: Strictly necessary only.');

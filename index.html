@@ -1208,7 +1208,7 @@
   <!-- =====================================================================
        COOKIE & LOCAL STORAGE CONSENT BANNER (INDIA DPDP ACT & GDPR)
   ===================================================================== -->
-  <div class="cookie-banner" id="cookie-consent-banner" role="region" aria-label="Cookie and Storage Consent Notice">
+  <div class="cookie-banner active" id="cookie-consent-banner" role="region" aria-label="Cookie and Storage Consent Notice">
     <div class="cookie-header">
       <div style="display:flex; align-items:center; gap:10px;">
         <span style="font-size:24px; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15));">🍪</span>
@@ -1262,6 +1262,11 @@
       <span style="font-size:10.5px; color:var(--ink-soft);">🔒 End-to-End Encrypted</span>
     </div>
   </div>
+
+  <!-- FLOATING COOKIE RE-OPEN BADGE -->
+  <button id="btn-cookie-manage" onclick="reopenCookieBanner()" title="Cookie & Storage Preferences" style="position:fixed; bottom:20px; left:20px; z-index:999980; background:#ffffff; border:1.5px solid #6366f1; border-radius:999px; padding:6px 14px; font-size:12px; font-weight:700; color:#4f46e5; box-shadow:0 4px 14px rgba(99,102,241,0.25); display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:all 0.2s ease;">
+    <span>🍪</span> Cookie Preferences
+  </button>
 
 
   <!-- =====================================================================
