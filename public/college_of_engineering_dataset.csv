@@ -1,0 +1,16 @@
+Task Name,Status,Start Date,Due Date,% Complete,Priority,Assignee,Estimated Cost,Actual Cost
+Academic Council Charter & Budget Approval,Completed,2026-08-01,2026-08-08,100,High,Dr. Rajesh Sharma,2000,1950
+Departmental Needs Analysis & Lab Survey,Completed,2026-08-05,2026-08-15,100,Medium,Prof. Ananya Sen,2500,2400
+IoT Sensor & Hardware Specification,Completed,2026-08-12,2026-08-22,100,High,Rohan Verma,3800,3950
+Embedded Firmware & Microcontroller Logic,Completed,2026-08-18,2026-08-30,100,High,Rohan Verma,4200,4100
+Smart Lab Energy Monitoring Circuitry,In Progress,2026-08-25,2026-09-08,80,High,Vikram Patil,4800,4200
+Campus Cloud Server & Database Schema,In Progress,2026-08-27,2026-09-10,70,High,Sneha Kulkarni,3600,2800
+Student & Faculty Portal UI Design,Completed,2026-08-20,2026-08-29,100,Medium,Pooja Mehta,1800,1750
+RFID Attendance & Lab Access Subsystem,Blocked,2026-08-28,2026-09-06,35,High,Vikram Patil,3200,2100
+Automated PCB Fabrication & Soldering,In Progress,2026-09-01,2026-09-14,50,High,Rohan Verma,3500,1900
+Robotics & CNC Machine Telemetry Integration,Blocked,2026-09-02,2026-09-11,20,Medium,Sneha Kulkarni,2800,900
+High-Voltage Safety & Grounding Inspection,In Progress,2026-09-03,2026-09-12,45,High,Prof. Ananya Sen,1500,800
+Mobile App for Lab Slot Booking & Schedules,Not Started,2026-09-08,2026-09-22,0,Medium,Pooja Mehta,3000,0
+Wi-Fi 6 Mesh Network Deployment in Labs,Not Started,2026-09-12,2026-09-24,0,High,Network Team,4500,0
+NBA / NAAC Accreditation Compliance Audit,Not Started,2026-09-18,2026-09-28,0,High,Dr. Rajesh Sharma,2500,0
+Final Multi-Lab Commissioning & Dean Sign-off,Not Started,2026-09-22,2026-10-05,0,High,Dean of Engineering,2000,0
