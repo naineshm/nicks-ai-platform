@@ -12,6 +12,29 @@ const state = {
   goals: JSON.parse(localStorage.getItem('pulsepm_goals') || '[]'),
   profile: JSON.parse(localStorage.getItem('pulsepm_profile') || '{"fullName":"","email":"","org":"","experience":"Experienced","bio":""}'),
   tasks: JSON.parse(localStorage.getItem('pulsepm_tasks') || '[]'),
+  okrs: JSON.parse(localStorage.getItem('nicks_ai_okrs') || 'null') || [
+    {
+      id: 1,
+      title: 'Objective 1: Achieve SOC2 Type II & Enterprise Security Compliance',
+      progress: 75,
+      icon: '🔒',
+      keyResults: 'Complete Security Vulnerability Audit, Auth & RBAC Security Layer, and Data Encryption standards.'
+    },
+    {
+      id: 2,
+      title: "Objective 2: Launch Nick's AI Predictive Core Engine v1.0",
+      progress: 58,
+      icon: '🤖',
+      keyResults: 'Complete EVM & Analytics Calculation Engine, What-If Simulator, and AI Assistant recommendations.'
+    },
+    {
+      id: 3,
+      title: 'Objective 3: Maintain 99.9% Production Infrastructure Availability',
+      progress: 90,
+      icon: '⚡',
+      keyResults: 'E2E QA Test Suite execution, load testing, and cloud failover readiness.'
+    }
+  ],
   analysis: null,
   chatMessages: [],
   activeDashTab: 'overview',
@@ -28,6 +51,7 @@ function saveState(){
   localStorage.setItem('nicks_ai_goals', JSON.stringify(state.goals));
   localStorage.setItem('nicks_ai_profile', JSON.stringify(state.profile));
   localStorage.setItem('nicks_ai_tasks', JSON.stringify(state.tasks));
+  localStorage.setItem('nicks_ai_okrs', JSON.stringify(state.okrs));
 }
 
 
@@ -261,6 +285,142 @@ function switchDashTab(tab){
   if(tab==='simulator') runSimulation();
   if(tab==='profile') renderProfileTab();
   if(tab==='assistant') seedChat();
+  if(tab==='okrs') renderOKRs();
+}
+
+/* =====================================================================
+   STRATEGIC OKR & GOAL HIERARCHY ENGINE
+===================================================================== */
+function renderOKRs(){
+  const container = document.getElementById('okrs-container');
+  if(!container) return;
+  if(!state.okrs || !state.okrs.length){
+    container.innerHTML = `
+      <div class="panel" style="text-align:center; padding:36px 20px;">
+        <div style="font-size:40px; margin-bottom:12px;">🎯</div>
+        <h3 style="margin-bottom:6px; color:var(--ink);">No Strategic OKRs Defined Yet</h3>
+        <p style="color:var(--ink-soft); max-width:440px; margin:0 auto 18px auto; font-size:13px; line-height:1.45;">Create your first high-level corporate objective to align daily task execution with corporate key results.</p>
+        <button class="btn btn-primary btn-sm" onclick="openCreateOKRModal()">+ Create Strategic OKR</button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = state.okrs.map((okr, idx) => {
+    const pct = Math.min(100, Math.max(0, Number(okr.progress) || 0));
+    const fillColor = pct >= 80 ? 'var(--mint)' : pct >= 50 ? 'var(--purple)' : 'var(--amber)';
+    return `
+      <div class="panel" style="margin-bottom:18px;">
+        <div class="panel-head" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+          <div style="display:flex; align-items:flex-start; gap:12px;">
+            <div style="font-size:24px; line-height:1; padding-top:2px;">${okr.icon || '🎯'}</div>
+            <div>
+              <h3 style="margin:0 0 4px 0; font-size:14.5px; color:var(--ink); font-weight:700;">${okr.title}</h3>
+              <div style="font-size:11.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.04em; font-weight:700;">Strategic Objective #${idx + 1}</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="hint" style="font-weight:700; color:var(--ink); font-size:12.5px;">Progress: ${pct}% Complete</span>
+            <button class="btn btn-ghost btn-sm" title="Edit Objective" onclick="editOKR(${okr.id})" style="padding:4px 8px; font-size:12px;">✏️ Edit</button>
+            <button class="btn btn-ghost btn-sm" title="Delete Objective" onclick="deleteOKR(${okr.id})" style="padding:4px 8px; font-size:12px; color:var(--red);">🗑️</button>
+          </div>
+        </div>
+
+        <div class="workload-track" style="height:10px; margin-bottom:12px; background:var(--border-soft); border-radius:999px; overflow:hidden;">
+          <div class="workload-fill" style="width:${pct}%; height:100%; background:${fillColor}; border-radius:999px; transition:width 0.4s ease;"></div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; font-size:12.5px; color:var(--ink-soft);">
+          <div style="flex:1; min-width:240px;">
+            <strong style="color:var(--ink);">Key Results:</strong> ${okr.keyResults || 'Complete planned milestones and quarterly deliverable gates.'}
+          </div>
+          <div style="display:inline-flex; align-items:center; gap:6px;">
+            <span style="font-size:11px; font-weight:600; color:var(--ink-soft);">Quick Adjust:</span>
+            <button class="btn btn-outline btn-sm" style="font-size:11px; padding:2px 8px;" onclick="adjustOKRProgress(${okr.id}, -10)">-10%</button>
+            <button class="btn btn-outline btn-sm" style="font-size:11px; padding:2px 8px;" onclick="adjustOKRProgress(${okr.id}, 10)">+10%</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openCreateOKRModal(){
+  document.getElementById('modal-okr-id').value = '';
+  document.getElementById('modal-okr-title').textContent = 'Create Strategic OKR';
+  document.getElementById('modal-okr-name').value = '';
+  document.getElementById('modal-okr-keyresults').value = '';
+  document.getElementById('modal-okr-progress').value = '0';
+  document.getElementById('modal-okr-icon').value = '🎯';
+  const modal = document.getElementById('modal-okr');
+  if(modal) modal.classList.add('active');
+  setTimeout(() => document.getElementById('modal-okr-name').focus(), 50);
+}
+
+function closeOKRModal(){
+  const modal = document.getElementById('modal-okr');
+  if(modal) modal.classList.remove('active');
+}
+
+function editOKR(id){
+  const okr = state.okrs.find(o => o.id === id);
+  if(!okr) return;
+  document.getElementById('modal-okr-id').value = okr.id;
+  document.getElementById('modal-okr-title').textContent = 'Edit Strategic OKR';
+  document.getElementById('modal-okr-name').value = okr.title;
+  document.getElementById('modal-okr-keyresults').value = okr.keyResults || '';
+  document.getElementById('modal-okr-progress').value = okr.progress || 0;
+  document.getElementById('modal-okr-icon').value = okr.icon || '🎯';
+  const modal = document.getElementById('modal-okr');
+  if(modal) modal.classList.add('active');
+}
+
+function saveOKR(){
+  const title = (document.getElementById('modal-okr-name').value || '').trim();
+  const keyResults = (document.getElementById('modal-okr-keyresults').value || '').trim();
+  const progress = Math.min(100, Math.max(0, parseInt(document.getElementById('modal-okr-progress').value, 10) || 0));
+  const icon = document.getElementById('modal-okr-icon').value || '🎯';
+  const idVal = document.getElementById('modal-okr-id').value;
+
+  if(!title){
+    showToast('⚠️ Please enter an Objective title');
+    document.getElementById('modal-okr-name').focus();
+    return;
+  }
+
+  if(idVal){
+    const id = parseInt(idVal, 10);
+    const idx = state.okrs.findIndex(o => o.id === id);
+    if(idx !== -1){
+      state.okrs[idx] = { ...state.okrs[idx], title, keyResults, progress, icon };
+      showToast('✓ Strategic OKR updated!');
+    }
+  } else {
+    const newId = state.okrs.length ? Math.max(...state.okrs.map(o => o.id || 0)) + 1 : 1;
+    state.okrs.push({ id: newId, title, keyResults, progress, icon });
+    showToast('🎯 Strategic OKR created and aligned!');
+  }
+
+  saveState();
+  renderOKRs();
+  closeOKRModal();
+}
+
+function deleteOKR(id){
+  if(!confirm('Are you sure you want to remove this Strategic OKR?')) return;
+  state.okrs = state.okrs.filter(o => o.id !== id);
+  saveState();
+  renderOKRs();
+  showToast('🗑️ Strategic OKR removed');
+}
+
+function adjustOKRProgress(id, delta){
+  const okr = state.okrs.find(o => o.id === id);
+  if(!okr) return;
+  okr.progress = Math.min(100, Math.max(0, (okr.progress || 0) + delta));
+  saveState();
+  renderOKRs();
+  showToast(`📊 Updated progress to ${okr.progress}%`);
 }
 
 /* =====================================================================

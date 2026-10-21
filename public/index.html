@@ -702,47 +702,10 @@
               <h1>Strategic OKRs & Goal Hierarchy</h1>
               <p>Align daily task execution with high-level corporate objectives and key results.</p>
             </div>
-            <button class="btn btn-primary btn-sm" onclick="showToast('🎯 OKR Alignment Active')">+ Create Strategic OKR</button>
+            <button class="btn btn-primary btn-sm" onclick="openCreateOKRModal()">+ Create Strategic OKR</button>
           </div>
 
-          <div class="panel" style="margin-bottom:18px;">
-            <div class="panel-head">
-              <h3>Objective 1: Achieve SOC2 Type II & Enterprise Security Compliance</h3>
-              <span class="hint">Progress: 75% Complete</span>
-            </div>
-            <div class="workload-track" style="height:10px; margin-bottom:12px;">
-              <div class="workload-fill" style="width:75%; background:var(--mint);"></div>
-            </div>
-            <div style="font-size:12.5px; color:var(--ink-soft);">
-              🔒 <strong>Key Results:</strong> Complete Security Vulnerability Audit, Auth & RBAC Security Layer, and Data Encryption standards.
-            </div>
-          </div>
-
-          <div class="panel" style="margin-bottom:18px;">
-            <div class="panel-head">
-              <h3>Objective 2: Launch Nick's AI Predictive Core Engine v1.0</h3>
-              <span class="hint">Progress: 58% Complete</span>
-            </div>
-            <div class="workload-track" style="height:10px; margin-bottom:12px;">
-              <div class="workload-fill" style="width:58%; background:var(--purple);"></div>
-            </div>
-            <div style="font-size:12.5px; color:var(--ink-soft);">
-              🤖 <strong>Key Results:</strong> Complete EVM & Analytics Calculation Engine, What-If Simulator, and AI Assistant recommendations.
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-head">
-              <h3>Objective 3: Maintain 99.9% Production Infrastructure Availability</h3>
-              <span class="hint">Progress: 90% Complete</span>
-            </div>
-            <div class="workload-track" style="height:10px; margin-bottom:12px;">
-              <div class="workload-fill" style="width:90%; background:var(--mint);"></div>
-            </div>
-            <div style="font-size:12.5px; color:var(--ink-soft);">
-              ⚡ <strong>Key Results:</strong> E2E QA Test Suite execution, load testing, and cloud failover readiness.
-            </div>
-          </div>
+          <div id="okrs-container"></div>
         </div>
 
         <!-- INTEGRATIONS & WEBHOOKS TAB -->
@@ -1056,6 +1019,47 @@
       <div class="modal-foot">
         <button class="btn btn-ghost" onclick="closeScheduleMeetingModal()">Cancel</button>
         <button class="btn btn-primary" onclick="handleCreateMeeting()">📧 Schedule & Dispatch Email Invites</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CREATE / EDIT STRATEGIC OKR MODAL -->
+  <div class="modal-backdrop" id="modal-okr">
+    <div class="modal" style="max-width:540px;">
+      <div class="modal-head">
+        <h3 id="modal-okr-title">Create Strategic OKR</h3>
+        <button class="btn btn-ghost btn-sm" onclick="closeOKRModal()">✕</button>
+      </div>
+      <input type="hidden" id="modal-okr-id">
+      <div class="field">
+        <label for="modal-okr-name">Objective Title *</label>
+        <input type="text" id="modal-okr-name" placeholder="e.g. Objective: Deploy Departmental Smart Labs & IoT Nodes" aria-required="true">
+      </div>
+      <div class="field">
+        <label for="modal-okr-keyresults">Key Results & Success Criteria *</label>
+        <textarea id="modal-okr-keyresults" rows="3" class="search-input" style="width:100%; border-radius:8px; padding:10px; font-family:inherit; resize:vertical; box-sizing:border-box;" placeholder="e.g. Complete 50 sensor nodes, achieve 100% lab telemetry, pass safety inspection."></textarea>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="modal-okr-progress">Initial Progress (%)</label>
+          <input type="number" min="0" max="100" id="modal-okr-progress" value="0">
+        </div>
+        <div class="field">
+          <label for="modal-okr-icon">Category Icon</label>
+          <select id="modal-okr-icon">
+            <option value="🎯">🎯 Strategic Milestone</option>
+            <option value="🔒">🔒 Security & Compliance</option>
+            <option value="🤖">🤖 AI & Algorithms</option>
+            <option value="🎓">🎓 Academic & Labs</option>
+            <option value="⚡">⚡ Infrastructure & Cloud</option>
+            <option value="📊">📊 Analytics & Metrics</option>
+            <option value="🚀">🚀 Product & Launch</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-foot" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button class="btn btn-outline" onclick="closeOKRModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveOKR()">Save Strategic OKR</button>
       </div>
     </div>
   </div>
