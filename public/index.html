@@ -715,44 +715,52 @@
               <h1>Enterprise Webhook & Integration Hub</h1>
               <p>Stream real-time risk alerts, daily AI standups, and milestone updates to your team tools.</p>
             </div>
-            <button class="btn btn-primary btn-sm" onclick="showToast('⚡ Webhook Dispatcher Enabled')">+ Add Integration</button>
+            <button class="btn btn-primary btn-sm" onclick="openCreateIntegrationModal()">+ Add Integration</button>
           </div>
 
-          <div class="grid-2">
-            <div class="panel">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h3 style="margin:0; font-size:15px;">💬 Slack Channel Alerts</h3>
-                <span class="badge badge-mint"><span class="badge-dot"></span>Simulation Sandbox Ready</span>
-              </div>
-              <p style="font-size:12.5px; color:var(--ink-soft); margin-bottom:12px;">Auto-post overdue task warnings and EVM cost variance alerts to <code>#proj-nicks-ai-alerts</code>.</p>
-              <button class="btn btn-outline btn-sm" onclick="showToast('💬 Slack Webhook Test Sent to #proj-nicks-ai-alerts!')">Test Slack Webhook</button>
+          <!-- Quick Stats Overview Bar -->
+          <div class="stat-grid" style="margin-bottom:20px;">
+            <div class="stat-card">
+              <div class="stat-label">Connected Integrations</div>
+              <div class="stat-value" id="int-stat-count">4 Active</div>
+              <div class="stat-sub up" id="int-stat-sub">100% Sandbox Health</div>
             </div>
-
-            <div class="panel">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h3 style="margin:0; font-size:15px;">🟦 Microsoft Teams Integration</h3>
-                <span class="badge badge-mint"><span class="badge-dot"></span>Simulation Sandbox Ready</span>
+            <div class="stat-card">
+              <div class="stat-label">Webhook Dispatch Engine</div>
+              <div class="stat-value" style="color:var(--mint); font-size:18px; display:flex; align-items:center; gap:6px;">
+                <span class="badge-dot" style="background:var(--mint); width:10px; height:10px; display:inline-block; border-radius:50%;"></span>
+                Online & Armed
               </div>
-              <p style="font-size:12.5px; color:var(--ink-soft); margin-bottom:12px;">Send daily AI Executive Summaries to the <code>Engineering Leadership</code> Teams channel.</p>
-              <button class="btn btn-outline btn-sm" onclick="showToast('🟦 MS Teams Webhook Test Sent!')">Test Teams Webhook</button>
+              <div class="stat-sub up">Real-time event streaming</div>
             </div>
-
-            <div class="panel">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h3 style="margin:0; font-size:15px;">🔷 Jira Bidirectional Sync</h3>
-                <span class="badge badge-mint"><span class="badge-dot"></span>Simulation Sandbox Ready</span>
-              </div>
-              <p style="font-size:12.5px; color:var(--ink-soft); margin-bottom:12px;">Synchronize task statuses, assignees, and % completion automatically with Jira Cloud.</p>
-              <button class="btn btn-outline btn-sm" onclick="showToast('🔷 Jira Sync Complete: 8 Issues Updated')">Run Jira Sync</button>
+            <div class="stat-card">
+              <div class="stat-label">Events Dispatched</div>
+              <div class="stat-value" id="int-stat-events">14 Events</div>
+              <div class="stat-sub up">Simulated HTTP 200 delivery</div>
             </div>
+            <div class="stat-card">
+              <div class="stat-label">Avg Response Latency</div>
+              <div class="stat-value" id="int-stat-latency">118 ms</div>
+              <div class="stat-sub up">Sub-second websocket relay</div>
+            </div>
+          </div>
 
-            <div class="panel">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h3 style="margin:0; font-size:15px;">🐙 GitHub Repository Webhooks</h3>
-                <span class="badge badge-mint"><span class="badge-dot"></span>Simulation Sandbox Ready</span>
+          <!-- Dynamic Integrations Cards Grid -->
+          <div id="integrations-container" class="grid-2">
+            <!-- Dynamically rendered by renderIntegrations() -->
+          </div>
+
+          <!-- Live Webhook Dispatch Audit Log -->
+          <div class="panel" style="margin-top:24px;">
+            <div class="panel-head" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <div>
+                <h3 style="margin:0; font-size:15px; color:var(--ink);">📡 Live Webhook Dispatch & Audit Stream</h3>
+                <p style="margin:2px 0 0 0; font-size:12px; color:var(--ink-soft);">Real-time stream of outbound notifications, trigger payloads, and endpoint response statuses.</p>
               </div>
-              <p style="font-size:12.5px; color:var(--ink-soft); margin-bottom:12px;">Automatically mark tasks as completed when Pull Requests are merged into <code>main</code>.</p>
-              <button class="btn btn-outline btn-sm" onclick="showToast('🐙 GitHub Webhook Listening on main branch')">Verify Webhook</button>
+              <button class="btn btn-ghost btn-sm" onclick="clearIntegrationLogs()" style="font-size:12px;">Clear Audit Log</button>
+            </div>
+            <div id="integration-audit-log">
+              <!-- Dynamically rendered by renderIntegrationLogs() -->
             </div>
           </div>
         </div>
@@ -1060,6 +1068,110 @@
       <div class="modal-foot" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
         <button class="btn btn-outline" onclick="closeOKRModal()">Cancel</button>
         <button class="btn btn-primary" onclick="saveOKR()">Save Strategic OKR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CREATE / EDIT WEBHOOK INTEGRATION MODAL -->
+  <div class="modal-backdrop" id="modal-integration">
+    <div class="modal" style="max-width:580px;">
+      <div class="modal-head">
+        <h3 id="modal-integration-title">Add Webhook Integration</h3>
+        <button class="btn btn-ghost btn-sm" onclick="closeIntegrationModal()">✕</button>
+      </div>
+      <input type="hidden" id="modal-integration-id">
+      <div class="grid-2">
+        <div class="field">
+          <label for="modal-integration-platform">Platform / Service *</label>
+          <select id="modal-integration-platform" onchange="onIntegrationPlatformChange()">
+            <option value="slack">💬 Slack Channel Webhook</option>
+            <option value="teams">🟦 Microsoft Teams Connector</option>
+            <option value="jira">🔷 Atlassian Jira Cloud Sync</option>
+            <option value="github">🐙 GitHub Repository Webhook</option>
+            <option value="discord">🟣 Discord Webhook</option>
+            <option value="gitlab">🦊 GitLab CI/CD Pipeline</option>
+            <option value="pagerduty">🚨 PagerDuty Incident Dispatch</option>
+            <option value="custom">🌐 Custom REST API Webhook</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="modal-integration-name">Integration Name *</label>
+          <input type="text" id="modal-integration-name" placeholder="e.g. Slack Engineering Alerts" aria-required="true">
+        </div>
+      </div>
+      <div class="field">
+        <label for="modal-integration-target">Target Channel, Board or Resource *</label>
+        <input type="text" id="modal-integration-target" placeholder="e.g. #proj-nicks-ai-alerts or Engineering Leadership">
+      </div>
+      <div class="field">
+        <label for="modal-integration-url">Webhook URL / Endpoint</label>
+        <input type="text" id="modal-integration-url" placeholder="https://hooks.slack.com/services/...">
+        <div style="font-size:11px; color:var(--ink-soft); margin-top:4px;">In Simulation Sandbox mode, test payloads simulate reliable HTTP 200 delivery with instant payload inspection.</div>
+      </div>
+      <div class="field">
+        <label for="modal-integration-description">Description / Purpose</label>
+        <input type="text" id="modal-integration-description" placeholder="Brief note on what this integration broadcasts...">
+      </div>
+      <div class="field">
+        <label>Trigger Events (Select all that apply)</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:6px; font-size:12px;">
+          <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+            <input type="checkbox" id="int-ev-overdue" checked> Overdue Task Alerts
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+            <input type="checkbox" id="int-ev-evm" checked> EVM Cost / Schedule Variance
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+            <input type="checkbox" id="int-ev-milestone" checked> Sprint Milestone Gates
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+            <input type="checkbox" id="int-ev-standup"> Daily AI Standup Digest
+          </label>
+        </div>
+      </div>
+      <div class="modal-foot" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button class="btn btn-outline" onclick="closeIntegrationModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveIntegration()">Save Integration</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEBHOOK PAYLOAD INSPECTOR MODAL -->
+  <div class="modal-backdrop" id="modal-webhook-payload">
+    <div class="modal" style="max-width:680px;">
+      <div class="modal-head" style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="font-size:26px;" id="payload-modal-icon">💬</div>
+          <div>
+            <h3 id="payload-modal-title" style="margin:0; font-size:16px;">Slack Webhook Test Dispatched</h3>
+            <div id="payload-modal-sub" style="font-size:12px; color:var(--ink-soft);">Target: #proj-nicks-ai-alerts • HTTP 200 OK</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="closePayloadModal()">✕</button>
+      </div>
+
+      <div style="display:flex; gap:12px; margin:16px 0; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.3); border-radius:8px; padding:12px;">
+        <div style="font-size:20px;">✅</div>
+        <div style="font-size:12.5px; line-height:1.45;">
+          <strong style="color:var(--mint);">Payload Successfully Delivered!</strong>
+          <div style="color:var(--ink-soft);" id="payload-modal-banner-desc">The simulation sandbox received and validated the webhook event with zero packet loss and a sub-second round-trip latency.</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <label style="margin:0; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.04em;">HTTP Request & JSON Payload</label>
+          <button class="btn btn-ghost btn-sm" onclick="copyWebhookPayload()" style="font-size:11px; padding:2px 8px;">📋 Copy JSON</button>
+        </div>
+        <pre id="payload-modal-code" style="background:#0f172a; color:#38bdf8; padding:14px; border-radius:8px; font-size:12px; font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; max-height:280px; overflow-y:auto; margin:0; line-height:1.45; border:1px solid rgba(255,255,255,0.08);"></pre>
+      </div>
+
+      <div class="modal-foot" style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
+        <div style="font-size:11.5px; color:var(--ink-soft);" id="payload-modal-latency-note">Roundtrip Latency: 124 ms</div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-outline" onclick="copyWebhookPayload()">📋 Copy Payload</button>
+          <button class="btn btn-primary" onclick="closePayloadModal()">Done</button>
+        </div>
       </div>
     </div>
   </div>

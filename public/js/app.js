@@ -35,6 +35,93 @@ const state = {
       keyResults: 'E2E QA Test Suite execution, load testing, and cloud failover readiness.'
     }
   ],
+  integrations: JSON.parse(localStorage.getItem('nicks_ai_integrations') || 'null') || [
+    {
+      id: 1,
+      name: 'Slack Channel Alerts',
+      platform: 'slack',
+      icon: '💬',
+      target: '#proj-nicks-ai-alerts',
+      url: 'https://hooks.slack.com/services/T00/B00/nicks-ai-alerts',
+      description: 'Auto-post overdue task warnings and EVM cost variance alerts to #proj-nicks-ai-alerts.',
+      events: ['Overdue Task Alerts', 'EVM Cost Variance', 'Risk Sentinel Beacons'],
+      testButtonLabel: 'Test Slack Webhook',
+      status: 'Ready',
+      lastTestStatus: null,
+      lastTestTime: null,
+      lastLatency: null
+    },
+    {
+      id: 2,
+      name: 'Microsoft Teams Integration',
+      platform: 'teams',
+      icon: '🟦',
+      target: 'Engineering Leadership Teams Channel',
+      url: 'https://outlook.office.com/webhook/nicks-ai-teams-lead',
+      description: 'Send daily AI Executive Summaries to the Engineering Leadership Teams channel.',
+      events: ['Daily AI Standup', 'Executive EVM Summary', 'Milestone Gate Alerts'],
+      testButtonLabel: 'Test Teams Webhook',
+      status: 'Ready',
+      lastTestStatus: null,
+      lastTestTime: null,
+      lastLatency: null
+    },
+    {
+      id: 3,
+      name: 'Jira Bidirectional Sync',
+      platform: 'jira',
+      icon: '🔷',
+      target: 'Jira Cloud Project Board',
+      url: 'https://your-org.atlassian.net/rest/api/3/webhook',
+      description: 'Synchronize task statuses, assignees, and % completion automatically with Jira Cloud.',
+      events: ['Issue Status Transition', 'Sprint Burndown Sync', 'Capacity Limit Sync'],
+      testButtonLabel: 'Run Jira Sync',
+      status: 'Ready',
+      lastTestStatus: null,
+      lastTestTime: null,
+      lastLatency: null
+    },
+    {
+      id: 4,
+      name: 'GitHub Repository Webhooks',
+      platform: 'github',
+      icon: '🐙',
+      target: 'main branch / Pull Requests',
+      url: 'https://api.github.com/repos/org/repo/hooks',
+      description: 'Automatically mark tasks as completed when Pull Requests are merged into main.',
+      events: ['PR Merged -> Mark Complete', 'Commit Linked to Task', 'Release Tagged'],
+      testButtonLabel: 'Verify Webhook',
+      status: 'Ready',
+      lastTestStatus: null,
+      lastTestTime: null,
+      lastLatency: null
+    }
+  ],
+  integrationLogs: JSON.parse(localStorage.getItem('nicks_ai_integration_logs') || 'null') || [
+    {
+      id: 101,
+      name: 'Slack Channel Alerts',
+      icon: '💬',
+      target: '#proj-nicks-ai-alerts',
+      event: 'Overdue Task Warning',
+      status: 'HTTP 200 OK',
+      latency: '112 ms',
+      time: '10:14 AM',
+      payload: '{\n  "event": "alert.overdue_task",\n  "task": "Battery Management Firmware",\n  "status": "warning"\n}'
+    },
+    {
+      id: 102,
+      name: 'Jira Bidirectional Sync',
+      icon: '🔷',
+      target: 'Jira Cloud Project Board',
+      event: 'Sprint Burndown Sync',
+      status: 'HTTP 200 OK',
+      latency: '145 ms',
+      time: '10:18 AM',
+      payload: '{\n  "event": "sync.sprint_velocity",\n  "velocity": "14.2 pts/day",\n  "synced_issues": 8\n}'
+    }
+  ],
+  dispatchedEventCount: parseInt(localStorage.getItem('nicks_ai_dispatched_count') || '14', 10),
   analysis: null,
   chatMessages: [],
   activeDashTab: 'overview',
@@ -52,6 +139,9 @@ function saveState(){
   localStorage.setItem('nicks_ai_profile', JSON.stringify(state.profile));
   localStorage.setItem('nicks_ai_tasks', JSON.stringify(state.tasks));
   localStorage.setItem('nicks_ai_okrs', JSON.stringify(state.okrs));
+  localStorage.setItem('nicks_ai_integrations', JSON.stringify(state.integrations));
+  localStorage.setItem('nicks_ai_integration_logs', JSON.stringify(state.integrationLogs));
+  localStorage.setItem('nicks_ai_dispatched_count', String(state.dispatchedEventCount || 14));
 }
 
 
@@ -286,6 +376,7 @@ function switchDashTab(tab){
   if(tab==='profile') renderProfileTab();
   if(tab==='assistant') seedChat();
   if(tab==='okrs') renderOKRs();
+  if(tab==='integrations') renderIntegrations();
 }
 
 /* =====================================================================
@@ -421,6 +512,618 @@ function adjustOKRProgress(id, delta){
   saveState();
   renderOKRs();
   showToast(`📊 Updated progress to ${okr.progress}%`);
+}
+
+/* =====================================================================
+   ENTERPRISE WEBHOOK & INTEGRATION HUB ENGINE
+===================================================================== */
+let currentInspectedPayload = '';
+
+function renderIntegrations(){
+  const container = document.getElementById('integrations-container');
+  if(!container) return;
+
+  if(!state.integrations) state.integrations = [];
+
+  const activeCount = state.integrations.length;
+  const countEl = document.getElementById('int-stat-count');
+  if(countEl) countEl.textContent = `${activeCount} Active`;
+
+  const subEl = document.getElementById('int-stat-sub');
+  if(subEl) subEl.textContent = activeCount ? '100% Sandbox Health' : 'No Webhooks Configured';
+
+  const eventsEl = document.getElementById('int-stat-events');
+  if(eventsEl) eventsEl.textContent = `${state.dispatchedEventCount || 14} Events`;
+
+  if(!state.integrations.length){
+    container.innerHTML = `
+      <div class="panel" style="grid-column: 1 / -1; text-align:center; padding:36px 20px;">
+        <div style="font-size:40px; margin-bottom:12px;">⚡</div>
+        <h3 style="margin-bottom:6px; color:var(--ink);">No Webhook Integrations Configured</h3>
+        <p style="color:var(--ink-soft); max-width:440px; margin:0 auto 18px auto; font-size:13px; line-height:1.45;">Connect Slack, Microsoft Teams, Jira, GitHub, or custom webhooks to stream live risk alerts and sprint milestones.</p>
+        <button class="btn btn-primary btn-sm" onclick="openCreateIntegrationModal()">+ Add Integration</button>
+      </div>
+    `;
+    renderIntegrationLogs();
+    return;
+  }
+
+  container.innerHTML = state.integrations.map(intg => {
+    const isTested = !!intg.lastTestStatus;
+    const statusBadge = isTested
+      ? `<span class="badge badge-mint" style="display:inline-flex; align-items:center; gap:5px;"><span class="badge-dot"></span>${intg.lastTestStatus} (${intg.lastLatency || '114ms'}) • ${intg.lastTestTime || 'Tested'}</span>`
+      : `<span class="badge badge-mint"><span class="badge-dot"></span>Simulation Sandbox Ready</span>`;
+
+    const buttonLabel = intg.testButtonLabel || (
+      intg.platform === 'slack' ? 'Test Slack Webhook' :
+      intg.platform === 'teams' ? 'Test Teams Webhook' :
+      intg.platform === 'jira' ? 'Run Jira Sync' :
+      intg.platform === 'github' ? 'Verify Webhook' :
+      'Test Webhook Dispatch'
+    );
+
+    const eventPills = (intg.events || ['Risk Sentinel Beacon', 'Milestone Alert']).map(ev => `
+      <span style="font-size:11px; padding:2px 8px; border-radius:999px; background:var(--border-soft); color:var(--ink); font-weight:600; display:inline-block; margin-right:4px; margin-bottom:4px;">${ev}</span>
+    `).join('');
+
+    let displayUrl = intg.url || 'https://hooks.example.com/services/sandbox';
+    if(displayUrl.length > 36){
+      displayUrl = displayUrl.substring(0, 28) + '••••••••';
+    }
+
+    return `
+      <div class="panel" style="display:flex; flex-direction:column; justify-content:space-between; margin-bottom:0;">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; gap:10px;">
+            <div style="display:flex; align-items:flex-start; gap:10px;">
+              <span style="font-size:22px; line-height:1;">${intg.icon || '⚡'}</span>
+              <div>
+                <h3 style="margin:0 0 3px 0; font-size:14.5px; font-weight:700; color:var(--ink);">${intg.name}</h3>
+                <div style="font-size:11.5px; color:var(--ink-soft); display:flex; align-items:center; gap:6px;">
+                  <span>Target:</span> <code style="font-size:11px; padding:1px 6px; background:rgba(0,0,0,0.04); border-radius:4px;">${intg.target || '#channel'}</code>
+                </div>
+              </div>
+            </div>
+            <div>${statusBadge}</div>
+          </div>
+
+          <p style="font-size:12.5px; color:var(--ink-soft); margin-bottom:12px; line-height:1.45;">${intg.description || 'Enterprise integration dispatcher for automated alerts and milestone telemetry.'}</p>
+
+          <div style="margin-bottom:12px;">
+            <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft); font-weight:700; margin-bottom:4px;">Trigger Subscriptions:</div>
+            <div>${eventPills}</div>
+          </div>
+
+          <div style="font-size:11px; color:var(--ink-soft); margin-bottom:16px;">
+            <span>Endpoint:</span> <code style="font-size:10.5px; color:var(--purple);">${displayUrl}</code>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; border-top:1px solid var(--border-soft); margin-top:8px; padding-top:12px;">
+          <button class="btn btn-outline btn-sm" id="btn-test-int-${intg.id}" onclick="testIntegration(${intg.id})" style="font-weight:600;">${buttonLabel}</button>
+          <div style="display:inline-flex; align-items:center; gap:4px;">
+            <button class="btn btn-ghost btn-sm" title="Inspect JSON Payload" onclick="inspectIntegrationPayload(${intg.id})" style="font-size:12px; padding:4px 8px;">🔍 Inspect</button>
+            <button class="btn btn-ghost btn-sm" title="Edit Integration" onclick="editIntegration(${intg.id})" style="font-size:12px; padding:4px 8px;">✏️</button>
+            <button class="btn btn-ghost btn-sm" title="Delete Integration" onclick="deleteIntegration(${intg.id})" style="font-size:12px; padding:4px 8px; color:var(--red);">🗑️</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  renderIntegrationLogs();
+}
+
+function renderIntegrationLogs(){
+  const logContainer = document.getElementById('integration-audit-log');
+  if(!logContainer) return;
+
+  if(!state.integrationLogs || !state.integrationLogs.length){
+    logContainer.innerHTML = `
+      <div style="text-align:center; padding:16px; font-size:12.5px; color:var(--ink-soft);">
+        No recent webhook dispatches logged yet. Click any test button above to fire a payload.
+      </div>
+    `;
+    return;
+  }
+
+  logContainer.innerHTML = `
+    <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border-soft); text-align:left; color:var(--ink-soft); font-size:11px; text-transform:uppercase;">
+            <th style="padding:8px 10px;">Time</th>
+            <th style="padding:8px 10px;">Platform & Integration</th>
+            <th style="padding:8px 10px;">Event Triggered</th>
+            <th style="padding:8px 10px;">Target</th>
+            <th style="padding:8px 10px;">Response Status</th>
+            <th style="padding:8px 10px;">Latency</th>
+            <th style="padding:8px 10px; text-align:right;">Payload</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${state.integrationLogs.map(log => `
+            <tr style="border-bottom:1px solid var(--border-soft);">
+              <td style="padding:8px 10px; color:var(--ink-soft); font-family:monospace; font-size:11px;">${log.time}</td>
+              <td style="padding:8px 10px; font-weight:600; color:var(--ink);">${log.icon || '⚡'} ${log.name}</td>
+              <td style="padding:8px 10px;"><span class="badge" style="background:rgba(99,102,241,0.08); color:var(--purple); font-size:11px;">${log.event}</span></td>
+              <td style="padding:8px 10px; font-family:monospace; font-size:11px; color:var(--ink-soft);">${log.target}</td>
+              <td style="padding:8px 10px;"><span class="badge badge-mint" style="font-size:11px;"><span class="badge-dot"></span>${log.status}</span></td>
+              <td style="padding:8px 10px; font-family:monospace; font-size:11px; color:var(--ink-soft);">${log.latency}</td>
+              <td style="padding:8px 10px; text-align:right;">
+                <button class="btn btn-ghost btn-sm" onclick="showRawPayload('${encodeURIComponent(log.payload)}', '${encodeURIComponent(log.name)}')" style="font-size:11px; padding:2px 8px;">View</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function generateIntegrationPayload(intg){
+  const nowIso = new Date().toISOString();
+  const currentVelocity = '14.2 pts/day';
+  const tasksCount = (state.tasks && state.tasks.length) || 12;
+
+  if(intg.platform === 'slack'){
+    return {
+      channel: intg.target || "#proj-nicks-ai-alerts",
+      username: "Nick's AI Sentinel Beacon",
+      icon_emoji: ":robot_face:",
+      attachments: [
+        {
+          fallback: "AI Risk Sentinel: Overdue task and cost variance alert dispatched.",
+          color: "#f59e0b",
+          pretext: "⚠️ *Nick's AI Enterprise Hub — Risk Warning Dispatch*",
+          title: "Sprint Sentinel Alert: Velocity & EVM Threshold Breach",
+          title_link: "https://nicks-ai-platform.onrender.com",
+          text: "Predictive model detected 1 critical path task exceeding nominal buffer. Automated reschedule suggested.",
+          fields: [
+            { title: "Team Velocity", value: currentVelocity, short: true },
+            { title: "EVM Index (CPI / SPI)", value: "0.98 / 1.04", short: true },
+            { title: "Active Tasks", value: String(tasksCount), short: true },
+            { title: "Forecast Completion", value: "Oct 06, 2026 (2d Ahead)", short: true }
+          ],
+          footer: "Nick's AI Integration Engine v2.4",
+          ts: Math.floor(Date.now() / 1000)
+        }
+      ]
+    };
+  }
+
+  if(intg.platform === 'teams'){
+    return {
+      "@type": "MessageCard",
+      "@context": "http://schema.org/extensions",
+      themeColor: "6366f1",
+      summary: "Nick's AI Executive Briefing",
+      sections: [{
+        activityTitle: "📢 Daily AI Project Health Executive Digest",
+        activitySubtitle: `Dispatched to ${intg.target} at ${new Date().toLocaleTimeString()}`,
+        activityImage: "https://nicks-ai-platform.onrender.com/favicon.ico",
+        facts: [
+          { name: "Portfolio Health Score", value: "92% Excellent" },
+          { name: "Burndown Trajectory", value: "94.2% On-Time Probability" },
+          { name: "Scope Creep", value: "0% Baseline Stable" },
+          { name: "Risk Sentinel Beacon", value: "1 Early Warning (Sam Okafor capacity limit)" }
+        ],
+        markdown: true
+      }],
+      potentialAction: [{
+        "@type": "OpenUri",
+        name: "Open Nick's AI Platform",
+        targets: [{ os: "default", uri: "https://nicks-ai-platform.onrender.com" }]
+      }]
+    };
+  }
+
+  if(intg.platform === 'jira'){
+    return {
+      webhookEvent: "jira:issue_updated",
+      timestamp: Date.now(),
+      issue: {
+        id: "10042",
+        key: "NICK-88",
+        fields: {
+          summary: "Battery Management Firmware Telemetry Sync",
+          status: { name: "In Progress", statusCategory: { name: "In Progress" } },
+          assignee: { displayName: "Sam Okafor", emailAddress: "sam.okafor@college.edu" },
+          customfield_ai_velocity: currentVelocity,
+          customfield_progress_pct: 68
+        }
+      },
+      syncSummary: {
+        totalIssuesChecked: 8,
+        issuesSynchronized: 8,
+        bidirectionalLatencyMs: 142,
+        status: "SUCCESS"
+      }
+    };
+  }
+
+  if(intg.platform === 'github'){
+    return {
+      action: "closed",
+      pull_request: {
+        number: 42,
+        title: "feat(evm): integrate predictive linear burndown slope",
+        state: "closed",
+        merged: true,
+        merged_at: nowIso,
+        user: { login: "naineshm" },
+        base: { ref: "main" }
+      },
+      repository: {
+        full_name: "naineshm/nicks-ai-platform",
+        html_url: "https://github.com/naineshm/nicks-ai-platform"
+      },
+      nicks_ai_hook: {
+        auto_completed_tasks: ["Task #3: Battery Management Firmware"],
+        sprint_velocity_increment: "+0.8 pts"
+      }
+    };
+  }
+
+  return {
+    source: "nicks-ai-enterprise-platform",
+    event: "webhook.test_dispatch",
+    timestamp: nowIso,
+    integration_name: intg.name,
+    target: intg.target,
+    environment: "simulation_sandbox",
+    payload: {
+      team_velocity: currentVelocity,
+      total_tasks: tasksCount,
+      risk_beacons: 1,
+      health_score: 92,
+      subscribed_events: intg.events || ["All Events"]
+    }
+  };
+}
+
+function testIntegration(id){
+  const intg = state.integrations.find(i => i.id === id);
+  if(!intg) return;
+
+  const btn = document.getElementById(`btn-test-int-${id}`);
+  if(btn){
+    btn.disabled = true;
+    btn.innerHTML = `⏳ Testing...`;
+  }
+
+  setTimeout(() => {
+    const latency = Math.floor(Math.random() * 45) + 105;
+    const latencyStr = latency + ' ms';
+    const timeStr = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+
+    intg.lastTestStatus = 'HTTP 200 OK';
+    intg.lastTestTime = timeStr;
+    intg.lastLatency = latencyStr;
+    state.dispatchedEventCount = (state.dispatchedEventCount || 14) + 1;
+
+    const payloadObj = generateIntegrationPayload(intg);
+    const payloadStr = JSON.stringify(payloadObj, null, 2);
+
+    if(!state.integrationLogs) state.integrationLogs = [];
+    state.integrationLogs.unshift({
+      id: Date.now(),
+      integrationId: id,
+      name: intg.name,
+      icon: intg.icon || '⚡',
+      target: intg.target || '#channel',
+      event: intg.events && intg.events[0] ? intg.events[0] : 'Webhook Test Dispatch',
+      status: 'HTTP 200 OK',
+      latency: latencyStr,
+      time: timeStr,
+      payload: payloadStr
+    });
+    if(state.integrationLogs.length > 25) state.integrationLogs.pop();
+
+    saveState();
+    renderIntegrations();
+
+    const toastMsg = intg.platform === 'slack' ? `💬 Slack Webhook Test Sent to ${intg.target}! (HTTP 200 OK)` :
+      intg.platform === 'teams' ? `🟦 MS Teams Webhook Test Sent to ${intg.target}! (HTTP 200 OK)` :
+      intg.platform === 'jira' ? `🔷 Jira Sync Complete: 8 Issues Synchronized! (HTTP 200 OK)` :
+      intg.platform === 'github' ? `🐙 GitHub Webhook Verified on ${intg.target}! (HTTP 200 OK)` :
+      `⚡ ${intg.name} test payload successfully delivered! (HTTP 200 OK)`;
+
+    showToast(toastMsg);
+
+    inspectPayloadData({
+      icon: intg.icon || '⚡',
+      title: `${intg.name} — Test Dispatched`,
+      target: intg.target,
+      status: 'HTTP 200 OK',
+      latency: latencyStr,
+      payload: payloadStr,
+      endpoint: intg.url || 'https://api.simulation.sandbox/v1/webhook'
+    });
+  }, 650);
+}
+
+function inspectIntegrationPayload(id){
+  const intg = state.integrations.find(i => i.id === id);
+  if(!intg) return;
+  const payloadObj = generateIntegrationPayload(intg);
+  const payloadStr = JSON.stringify(payloadObj, null, 2);
+  inspectPayloadData({
+    icon: intg.icon || '⚡',
+    title: `${intg.name} — Payload Inspection`,
+    target: intg.target,
+    status: intg.lastTestStatus || 'Simulation Ready (HTTP 200)',
+    latency: intg.lastLatency || '118 ms',
+    payload: payloadStr,
+    endpoint: intg.url || 'https://api.simulation.sandbox/v1/webhook'
+  });
+}
+
+function showRawPayload(encodedPayload, encodedName){
+  const payload = decodeURIComponent(encodedPayload);
+  const name = decodeURIComponent(encodedName);
+  inspectPayloadData({
+    icon: '📋',
+    title: `${name} — Audit Stream Log`,
+    target: 'Dispatched Payload',
+    status: 'HTTP 200 OK',
+    latency: 'Sub-second',
+    payload: payload,
+    endpoint: 'Archived in Audit Log'
+  });
+}
+
+function inspectPayloadData(data){
+  currentInspectedPayload = data.payload;
+  document.getElementById('payload-modal-icon').textContent = data.icon || '⚡';
+  document.getElementById('payload-modal-title').textContent = data.title;
+  document.getElementById('payload-modal-sub').textContent = `Target: ${data.target} • Status: ${data.status}`;
+  document.getElementById('payload-modal-latency-note').textContent = `Endpoint: ${data.endpoint} • Roundtrip Latency: ${data.latency}`;
+  document.getElementById('payload-modal-code').textContent = data.payload;
+
+  const modal = document.getElementById('modal-webhook-payload');
+  if(modal) modal.classList.add('active');
+}
+
+function closePayloadModal(){
+  const modal = document.getElementById('modal-webhook-payload');
+  if(modal) modal.classList.remove('active');
+}
+
+function copyWebhookPayload(){
+  if(!currentInspectedPayload) return;
+  navigator.clipboard.writeText(currentInspectedPayload).then(() => {
+    showToast('📋 Webhook JSON payload copied to clipboard!');
+  }).catch(() => {
+    const codeEl = document.getElementById('payload-modal-code');
+    if(codeEl){
+      const range = document.createRange();
+      range.selectNodeContents(codeEl);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      document.execCommand('copy');
+      showToast('📋 Webhook JSON payload copied to clipboard!');
+    }
+  });
+}
+
+function clearIntegrationLogs(){
+  if(!confirm('Clear all integration and webhook audit log entries?')) return;
+  state.integrationLogs = [];
+  saveState();
+  renderIntegrationLogs();
+  showToast('🗑️ Audit log cleared');
+}
+
+function openCreateIntegrationModal(){
+  document.getElementById('modal-integration-id').value = '';
+  document.getElementById('modal-integration-title').textContent = 'Add Webhook Integration';
+  document.getElementById('modal-integration-platform').value = 'slack';
+  document.getElementById('modal-integration-name').value = '';
+  document.getElementById('modal-integration-target').value = '';
+  document.getElementById('modal-integration-url').value = '';
+  document.getElementById('modal-integration-description').value = '';
+  document.getElementById('int-ev-overdue').checked = true;
+  document.getElementById('int-ev-evm').checked = true;
+  document.getElementById('int-ev-milestone').checked = true;
+  document.getElementById('int-ev-standup').checked = false;
+
+  onIntegrationPlatformChange();
+
+  const modal = document.getElementById('modal-integration');
+  if(modal) modal.classList.add('active');
+  setTimeout(() => document.getElementById('modal-integration-name').focus(), 50);
+}
+
+function closeIntegrationModal(){
+  const modal = document.getElementById('modal-integration');
+  if(modal) modal.classList.remove('active');
+}
+
+function onIntegrationPlatformChange(){
+  const plat = document.getElementById('modal-integration-platform').value;
+  const nameInput = document.getElementById('modal-integration-name');
+  const targetInput = document.getElementById('modal-integration-target');
+  const urlInput = document.getElementById('modal-integration-url');
+  const descInput = document.getElementById('modal-integration-description');
+
+  const defaults = {
+    slack: {
+      name: 'Slack Team Channel',
+      target: '#proj-nicks-ai-alerts',
+      url: 'https://hooks.slack.com/services/T00/B00/token',
+      desc: 'Broadcast real-time risk warnings and EVM cost variance alerts to Slack.'
+    },
+    teams: {
+      name: 'Microsoft Teams Channel',
+      target: 'Engineering Leadership Teams Channel',
+      url: 'https://outlook.office.com/webhook/incoming-guid',
+      desc: 'Send daily executive status summaries and velocity burndown reports to Teams.'
+    },
+    jira: {
+      name: 'Atlassian Jira Cloud Sync',
+      target: 'Jira Project Board',
+      url: 'https://your-org.atlassian.net/rest/api/3/webhook',
+      desc: 'Synchronize task statuses, sprint burndowns, and assignee allocations automatically with Jira.'
+    },
+    github: {
+      name: 'GitHub Repository Webhook',
+      target: 'main branch / Pull Requests',
+      url: 'https://api.github.com/repos/your-org/repo/hooks',
+      desc: 'Trigger task completion and velocity milestones upon pull request merges.'
+    },
+    discord: {
+      name: 'Discord Project Channel',
+      target: '#nicks-ai-dev-feed',
+      url: 'https://discord.com/api/webhooks/12345/abcdef',
+      desc: 'Post developer updates, build alerts, and blocker alerts to Discord.'
+    },
+    gitlab: {
+      name: 'GitLab CI/CD Pipeline Webhook',
+      target: 'Pipeline Gates / production',
+      url: 'https://gitlab.com/api/v4/projects/123/ref/main/trigger/pipeline',
+      desc: 'Trigger deployment pipelines and gate verification automatically on milestone approvals.'
+    },
+    pagerduty: {
+      name: 'PagerDuty Incident Dispatcher',
+      target: 'DevOps Primary On-Call',
+      url: 'https://events.pagerduty.com/v2/enqueue',
+      desc: 'Trigger high-urgency incident alerts when critical path schedule variance exceeds 20%.'
+    },
+    custom: {
+      name: 'Custom REST Webhook Endpoint',
+      target: 'Enterprise Event Bus',
+      url: 'https://api.yourcompany.com/v1/nicks-ai-webhooks',
+      desc: 'Dispatch JSON event payloads to your internal microservice or Kafka event bridge.'
+    }
+  };
+
+  const d = defaults[plat] || defaults.custom;
+  if(!nameInput.value || Object.values(defaults).some(x => x.name === nameInput.value)){
+    nameInput.value = d.name;
+  }
+  if(!targetInput.value || Object.values(defaults).some(x => x.target === targetInput.value)){
+    targetInput.value = d.target;
+  }
+  if(!urlInput.value || Object.values(defaults).some(x => x.url === urlInput.value)){
+    urlInput.value = d.url;
+  }
+  if(!descInput.value || Object.values(defaults).some(x => x.desc === descInput.value)){
+    descInput.value = d.desc;
+  }
+}
+
+function editIntegration(id){
+  const intg = state.integrations.find(i => i.id === id);
+  if(!intg) return;
+
+  document.getElementById('modal-integration-id').value = intg.id;
+  document.getElementById('modal-integration-title').textContent = 'Edit Webhook Integration';
+  document.getElementById('modal-integration-platform').value = intg.platform || 'slack';
+  document.getElementById('modal-integration-name').value = intg.name;
+  document.getElementById('modal-integration-target').value = intg.target || '';
+  document.getElementById('modal-integration-url').value = intg.url || '';
+  document.getElementById('modal-integration-description').value = intg.description || '';
+
+  const evList = intg.events || [];
+  document.getElementById('int-ev-overdue').checked = evList.some(e => e.includes('Overdue'));
+  document.getElementById('int-ev-evm').checked = evList.some(e => e.includes('EVM') || e.includes('Cost'));
+  document.getElementById('int-ev-milestone').checked = evList.some(e => e.includes('Milestone') || e.includes('Gate') || e.includes('PR'));
+  document.getElementById('int-ev-standup').checked = evList.some(e => e.includes('Standup') || e.includes('Digest'));
+
+  const modal = document.getElementById('modal-integration');
+  if(modal) modal.classList.add('active');
+  setTimeout(() => document.getElementById('modal-integration-name').focus(), 50);
+}
+
+function saveIntegration(){
+  const platform = document.getElementById('modal-integration-platform').value || 'slack';
+  const name = (document.getElementById('modal-integration-name').value || '').trim();
+  const target = (document.getElementById('modal-integration-target').value || '').trim();
+  const url = (document.getElementById('modal-integration-url').value || '').trim();
+  const description = (document.getElementById('modal-integration-description').value || '').trim();
+  const idVal = document.getElementById('modal-integration-id').value;
+
+  if(!name){
+    showToast('⚠️ Please enter an Integration Name');
+    document.getElementById('modal-integration-name').focus();
+    return;
+  }
+  if(!target){
+    showToast('⚠️ Please enter a Target Channel or Board');
+    document.getElementById('modal-integration-target').focus();
+    return;
+  }
+
+  const events = [];
+  if(document.getElementById('int-ev-overdue').checked) events.push('Overdue Task Alerts');
+  if(document.getElementById('int-ev-evm').checked) events.push('EVM Cost & Schedule Variances');
+  if(document.getElementById('int-ev-milestone').checked) events.push('Sprint Milestone Gates');
+  if(document.getElementById('int-ev-standup').checked) events.push('Daily AI Standup Digest');
+  if(!events.length) events.push('Risk Sentinel Beacons');
+
+  const icons = {
+    slack: '💬',
+    teams: '🟦',
+    jira: '🔷',
+    github: '🐙',
+    discord: '🟣',
+    gitlab: '🦊',
+    pagerduty: '🚨',
+    custom: '🌐'
+  };
+  const icon = icons[platform] || '⚡';
+
+  if(idVal){
+    const id = parseInt(idVal, 10);
+    const idx = state.integrations.findIndex(i => i.id === id);
+    if(idx !== -1){
+      state.integrations[idx] = {
+        ...state.integrations[idx],
+        platform,
+        name,
+        target,
+        url: url || state.integrations[idx].url,
+        description,
+        events,
+        icon
+      };
+      showToast('✓ Integration updated successfully!');
+    }
+  } else {
+    const newId = state.integrations.length ? Math.max(...state.integrations.map(i => i.id || 0)) + 1 : 1;
+    state.integrations.push({
+      id: newId,
+      platform,
+      name,
+      target,
+      url: url || `https://hooks.${platform}.com/services/simulated-token`,
+      description,
+      events,
+      icon,
+      testButtonLabel: `Test ${name}`,
+      status: 'Ready',
+      lastTestStatus: null,
+      lastTestTime: null,
+      lastLatency: null
+    });
+    showToast('⚡ New Integration added & ready for dispatch!');
+  }
+
+  saveState();
+  renderIntegrations();
+  closeIntegrationModal();
+}
+
+function deleteIntegration(id){
+  const intg = state.integrations.find(i => i.id === id);
+  if(!intg) return;
+  if(!confirm(`Remove integration "${intg.name}"?`)) return;
+  state.integrations = state.integrations.filter(i => i.id !== id);
+  saveState();
+  renderIntegrations();
+  showToast('🗑️ Integration removed');
 }
 
 /* =====================================================================
