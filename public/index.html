@@ -111,6 +111,8 @@
           <span>•</span>
           <a href="javascript:void(0)" onclick="openLegalModal('cookies')">Cookie Policy</a>
           <span>•</span>
+          <a href="javascript:void(0)" onclick="reopenCookieBanner()">🍪 Cookie Preferences</a>
+          <span>•</span>
           <a href="javascript:void(0)" onclick="openLegalModal('refund')">Refund Policy</a>
           <span>•</span>
           <a href="javascript:void(0)" onclick="openLegalModal('business')">Corporate & Grievance (DPDP)</a>
@@ -1208,8 +1210,17 @@
   ===================================================================== -->
   <div class="cookie-banner" id="cookie-consent-banner" role="region" aria-label="Cookie and Storage Consent Notice">
     <div class="cookie-header">
-      <span style="font-size:20px;">🍪</span>
-      <h4>Cookie & Client Storage Preferences</h4>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:24px; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15));">🍪</span>
+        <div>
+          <h4>Cookie & Client Storage Preferences</h4>
+          <span style="display:inline-flex; align-items:center; gap:5px; font-size:10.5px; font-weight:700; color:var(--purple); text-transform:uppercase; letter-spacing:0.04em;">
+            <span class="badge-dot" style="width:7px; height:7px; background:var(--mint); border-radius:50%; display:inline-block;"></span>
+            DPDP Act, 2023 & GDPR Compliant
+          </span>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="rejectOptionalCookies()" title="Dismiss (Keep necessary only)" style="padding:4px; font-size:14px; width:28px; height:28px; min-width:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--ink-soft); line-height:1;">✕</button>
     </div>
     <p class="cookie-desc">
       Nick's ai uses strictly necessary client-side storage to preserve authenticated sessions and protect account security. Optional storage retains your visual UI theme palette and local performance telemetry in compliance with India's <strong>Digital Personal Data Protection Act, 2023 (DPDP Act)</strong> and EU GDPR.
@@ -1246,8 +1257,9 @@
       <button class="btn btn-ghost btn-sm" onclick="toggleCookiePreferencesDrawer()" aria-label="Customize storage preferences">Preferences</button>
       <button class="btn btn-primary btn-sm" id="btn-save-prefs" style="display:none;" onclick="saveCustomCookiePreferences()" aria-label="Save chosen preferences">Save Preferences</button>
     </div>
-    <div style="font-size:11px; color:var(--ink-faint); margin-top:2px;">
-      Read our detailed <a href="javascript:void(0)" onclick="openLegalModal('cookies')">Cookie Policy</a> and <a href="javascript:void(0)" onclick="openLegalModal('privacy')">Privacy Policy</a>.
+    <div style="font-size:11.5px; color:var(--ink-soft); margin-top:2px; display:flex; justify-content:space-between; align-items:center;">
+      <span>Read our detailed <a href="javascript:void(0)" onclick="openLegalModal('cookies')">Cookie Policy</a> and <a href="javascript:void(0)" onclick="openLegalModal('privacy')">Privacy Policy</a>.</span>
+      <span style="font-size:10.5px; color:var(--ink-soft);">🔒 End-to-End Encrypted</span>
     </div>
   </div>
 

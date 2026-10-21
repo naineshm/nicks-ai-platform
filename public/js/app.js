@@ -3789,6 +3789,12 @@ function openCookieConsentPreferences() {
   if(saveBtn) saveBtn.style.display = 'inline-flex';
 }
 
+function reopenCookieBanner() {
+  const banner = document.getElementById('cookie-consent-banner');
+  if(!banner) return;
+  banner.classList.add('active');
+}
+
 /* =====================================================================
    GLOBAL ACCESSIBILITY & KEYBOARD SHORTCUTS (ESC TO CLOSE MODALS)
 ===================================================================== */
